@@ -1,6 +1,6 @@
 """Build a local Test place using only Python's standard library.
 
-Art source: assets/shore.json. Generated output: places/SlimeSalvage-Test.rbxlx.
+Art source: tools/world_art.py. Generated output: places/SlimeSalvage-Test.rbxlx.
 The output is disposable; never use it as the only copy of Studio art edits.
 """
 from pathlib import Path
@@ -47,7 +47,7 @@ def build():
         if group not in groups:
             groups[group], _ = item(workspace, 'Model', group)
         scene = groups[group]
-        _, props = item(scene, part.get('class', 'Part'), part['name'])
+        scene_part, props = item(scene, part.get('class', 'Part'), part['name'])
         prop(props, 'bool', 'Anchored', 'true')
         prop(props, 'bool', 'CanCollide', str(part.get('collide', True)).lower())
         prop(props, 'bool', 'CanTouch', 'false')
@@ -65,6 +65,26 @@ def build():
         prop(props, 'Color3uint8', 'Color3uint8', (red << 16) | (green << 8) | blue)
         prop(props, 'token', 'TopSurface', 0)
         prop(props, 'token', 'BottomSurface', 0)
+        if part.get('label'):
+            board, board_props = item(scene_part, 'BillboardGui', 'StationLabel')
+            prop(board_props, 'float', 'MaxDistance', 45)
+            prop(board_props, 'bool', 'AlwaysOnTop', 'false')
+            size = ET.SubElement(board_props, 'UDim2', name='Size')
+            for key, value in [('XS', 0), ('XO', 180), ('YS', 0), ('YO', 48)]:
+                ET.SubElement(size, key).text = str(value)
+            vector(board_props, 'StudsOffset', [0, 1.5, 0])
+            _, label_props = item(board, 'TextLabel', 'Text')
+            size = ET.SubElement(label_props, 'UDim2', name='Size')
+            for key, value in [('XS', 1), ('XO', 0), ('YS', 1), ('YO', 0)]:
+                ET.SubElement(size, key).text = str(value)
+            prop(label_props, 'string', 'Text', part['label'])
+            prop(label_props, 'float', 'TextSize', 14)
+            prop(label_props, 'bool', 'TextWrapped', 'true')
+            prop(label_props, 'float', 'BackgroundTransparency', 0.15)
+            for name, rgb in [('TextColor3', [1, 1, 0.9]), ('BackgroundColor3', [0.1, 0.2, 0.21])]:
+                color = ET.SubElement(label_props, 'Color3', name=name)
+                for key, value in zip(('R', 'G', 'B'), rgb):
+                    ET.SubElement(color, key).text = str(value)
         if part.get('class') == 'SpawnLocation':
             prop(props, 'bool', 'Neutral', 'true')
             prop(props, 'float', 'Duration', 0)

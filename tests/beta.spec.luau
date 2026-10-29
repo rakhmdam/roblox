@@ -286,4 +286,19 @@ test("out-of-range grace cancels work without rewards",function()
 	Resources.tick(s,1,10000,random,C,Game,blocked); assert(s.selected==1)
 	Resources.tick(s,2.1,10000,random,C,Game,blocked); assert(not s.selected and Game.cargoCount(s.profile)==0)
 end)
+test("resource footprints stay clear of stations on every island",function()
+	for _,island in C.order do
+		local positions=Resources.positions(island,C)
+		assert(#positions==36)
+		local seen={}
+		for _,pos in positions do
+			local x,z=pos[1]-C.islands[island].x,pos[3]
+			local key=tostring(x).."/"..tostring(z); assert(not seen[key]); seen[key]=true
+			assert(math.abs(x)<=40 and math.abs(z)<=34)
+			for _,station in {{-17,-15},{-16,18},{16,18}} do
+				assert(math.abs(x-station[1])>=6 or math.abs(z-station[2])>=6)
+			end
+		end
+	end
+end)
 print(tostring(total).." beta domain tests passed")

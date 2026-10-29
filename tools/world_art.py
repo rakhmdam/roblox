@@ -18,14 +18,29 @@ def parts():
             part(group, name, [7, 4, 6], [x+dx, 3.8, z+dz], color)
             part(group, name+'Roof', [9, 1, 8], [x+dx, 6.3, z+dz], accent)
             part(group, name+'Sign', [5, 2, .4], [x+dx, 6, z+dz+4], color, False)
+            result[-1]['label'] = {'Recycler': 'Переработка / Recycle',
+                                  'Workshop': 'Мастерская / Workshop',
+                                  'Nursery': 'Питомник / Nursery'}[name]
         for index, (dx, dz) in enumerate([(-36, -29), (36, -29), (-36, 28), (36, 28)]):
-            part(group, f'Trunk{index}', [2.5, 8, 2.5], [x+dx, 5, z+dz], [130, 92, 63])
-            part(group, f'Crown{index}', [10, 8, 10], [x+dx, 12, z+dz], accent, False, 'Ball')
+            if group == 'cave':
+                part(group, f'CrystalPillar{index}', [4, 14, 4], [x+dx, 8, z+dz], accent)
+                part(group, f'CrystalTip{index}', [3, 4, 3], [x+dx, 16, z+dz], [214, 196, 243], False, 'Ball', False)
+            elif group == 'bay':
+                part(group, f'CranePost{index}', [2, 12, 2], [x+dx, 7, z+dz], [115, 140, 151])
+                part(group, f'CraneBeam{index}', [8, 1, 2], [x+dx, 13, z+dz], [219, 174, 98], False)
+                part(group, f'CraneCable{index}', [.25, 5, .25], [x+dx+3, 10, z+dz], [71, 93, 102], False, query=False)
+            else:
+                part(group, f'Trunk{index}', [2.5, 8, 2.5], [x+dx, 5, z+dz], [130, 92, 63])
+                part(group, f'Crown{index}', [10, 8, 10], [x+dx, 12, z+dz], accent, False, 'Ball')
         for index in range(6):
             part(group, f'Rock{index}', [3+index%3, 2+index%2, 3],
                  [x-42+index*16, 1, z-42], [149, 159, 148], False)
         if not base:
             part(group, 'IslandGate', [10, 10, 2], [x, 6, z+38], accent, False)
+        if group == 'cave':
+            for i in range(7):
+                part(group, f'CavernWall{i}', [13, 12+i%3*3, 7], [x-39+i*13, 6, z-43], [96, 91, 119])
+            part(group, 'CavernLintel', [78, 5, 8], [x, 16, z-42], [111, 101, 137])
 
     themes = [([124, 174, 104], [137, 208, 143]),
               ([111, 140, 139], [168, 183, 166]),

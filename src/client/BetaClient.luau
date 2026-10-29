@@ -79,16 +79,25 @@ function Client.start()
 	end
 	local menu=frame(gui,UDim2.fromOffset(280,180),UDim2.new(0.5,-140,0.5,-70)); vertical(menu)
 	menu.Visible=false
-	local panel=frame(gui,UDim2.new(0.92,0,0.66,0),UDim2.fromScale(0.04,0.32)); panel.Visible=false; panel.ZIndex=5
+	local panel=frame(gui,UDim2.new(1,-24,1,-112),UDim2.fromOffset(12,102)); panel.Visible=false; panel.ZIndex=5
 	local panelTitle=label(panel,""); panelTitle.Size=UDim2.new(1,-140,0,44); panelTitle.Position=UDim2.fromOffset(12,0)
 	local content=Instance.new("ScrollingFrame"); content.Size=UDim2.new(1,-16,1,-64); content.Position=UDim2.fromOffset(8,56)
 	content.BackgroundTransparency=1; content.ScrollBarThickness=6; content.CanvasSize=UDim2.new(); content.AutomaticCanvasSize=Enum.AutomaticSize.Y
 	content.ScrollingDirection=Enum.ScrollingDirection.Y; content.Parent=panel
 	local toolbar=frame(gui,UDim2.new(1,-24,0,48),UDim2.fromOffset(12,102))
 	local toolbarLayout=Instance.new("UIGridLayout"); toolbarLayout.CellSize=UDim2.new(1/7,-4,0,48); toolbarLayout.CellPadding=UDim2.fromOffset(4,0); toolbarLayout.Parent=toolbar
+	local function layout()
+		local columns=if gui.AbsoluteSize.X<600 then 4 else 7
+		local height=if columns==4 then 100 else 48
+		toolbar.Size=UDim2.new(1,-24,0,height)
+		toolbarLayout.CellSize=UDim2.new(1/columns,-4,0,48)
+		toast.Position=UDim2.fromOffset(12,110+height)
+	end
+	gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(layout); layout()
 	local renderPanel: ()->()
 	local function open(name: string)
 		currentPanel=name; panel.Visible=name~=""; menu.Visible=state~=nil and not state.playing and name==""
+		toolbar.Visible=state~=nil and state.playing and name==""
 		request("Modal",{open=name~=""}); renderPanel()
 	end
 	local close=button(panel,"×",function() open("") end)
@@ -337,7 +346,7 @@ function Client.start()
 		if cargo>lastCargo then audio.play("collect") end
 		lastCargo=cargo
 		renderer.update(snapshot)
-		menu.Visible=not state.playing and currentPanel==""; toolbar.Visible=state.playing
+		menu.Visible=not state.playing and currentPanel==""; toolbar.Visible=state.playing and currentPanel==""
 		if oldLang~=lang then rebuildNavigation() end
 		if snapshot.requestId and pending and pending.request.requestId==snapshot.requestId and snapshot.errorCode~="Saving" then
 			pending=nil

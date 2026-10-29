@@ -5,9 +5,15 @@ local function distance(a: {number},b: {number}): number
 end
 function R.positions(island: string,c: any): {{number}}
 	local result={}
-	for row=0,5 do for col=0,5 do
+	for row=0,7 do for col=0,5 do
 		local x=if col<3 then -25+col*8 else 9+(col-3)*8
-		table.insert(result,{c.islands[island].x+x,2.8,-25+row*6})
+		local z=-31+row*6
+		-- Keep the entire junk silhouette outside station walls and roofs.
+		local blocked=false
+		for _,station in {{-17,-15},{-16,18},{16,18}} do
+			if math.abs(x-station[1])<6 and math.abs(z-station[2])<6 then blocked=true end
+		end
+		if not blocked and #result<36 then table.insert(result,{c.islands[island].x+x,2.8,z}) end
 	end end
 	return result
 end

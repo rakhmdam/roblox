@@ -1,5 +1,6 @@
 --!strict
 local Base={}
+local Art=require(script.Parent:WaitForChild("DecorationArt"))
 local slots: {[number]: Player}={}
 function Base.origin(slot: number): Vector3
 	return Vector3.new(((slot-1)%4-1.5)*150,0,-240-math.floor((slot-1)/4)*150)
@@ -14,6 +15,7 @@ function Base.release(slot: number)
 	if model then
 		model:SetAttribute("OwnerId",nil)
 		local decor=model:FindFirstChild("PlacedDecor"); if decor then decor:ClearAllChildren() end
+		local restored=model:FindFirstChild("RestorationArt"); if restored then restored:ClearAllChildren() end
 	end
 end
 function Base.paint(player: Player,s: any,c: any)
@@ -29,19 +31,30 @@ function Base.paint(player: Player,s: any,c: any)
 		local colors={Color3.fromRGB(143,142,100),Color3.fromRGB(126,157,92),Color3.fromRGB(104,172,91),Color3.fromRGB(85,192,107)}
 		garden.Color=colors[s.profile.base.restorationTier]
 	end
+	local restored=model:FindFirstChild("RestorationArt")
+	if not restored then restored=Instance.new("Folder"); restored.Name="RestorationArt"; restored.Parent=model end
+	restored:ClearAllChildren()
+	local tier=s.profile.base.restorationTier
+	local origin=Base.origin(s.slot)
+	if tier>=2 then
+		for _,x in {-8,8} do Art.create("planter",origin+Vector3.new(x,1.5,29),restored) end
+	end
+	if tier>=3 then
+		Art.create("bench",origin+Vector3.new(12,1.5,-30),restored)
+		Art.create("banner",origin+Vector3.new(-12,1.5,-30),restored)
+	end
+	if tier>=4 then
+		for _,x in {-8,8} do Art.create("lantern",origin+Vector3.new(x,1.5,38),restored) end
+		Art.create("crystal",origin+Vector3.new(0,1.5,-30),restored)
+	end
 	local folder=model:FindFirstChild("PlacedDecor")
 	if not folder then folder=Instance.new("Folder"); folder.Name="PlacedDecor"; folder.Parent=model end
 	folder:ClearAllChildren()
 	for slot,id in s.profile.base.decorationSlots do
 		local n=tonumber(slot) :: number
-		local index=table.find(c.decorOrder,id) or 1
-		local p=Instance.new("Part")
-		p.Name=id; p.Anchored=true; p.CanCollide=false
-		p.Shape=if index%3==0 then Enum.PartType.Ball elseif index%3==1 then Enum.PartType.Block else Enum.PartType.Cylinder
-		p.Size=Vector3.new(2+index%3,1+index%4,2+index%2)
-		p.Color=Color3.fromHSV(index/10,0.45,0.9)
-		p.Position=Base.origin(s.slot)+Vector3.new(if n%2==0 then 23 else -23,2+p.Size.Y/2,-24+math.floor((n-1)/2)*9)
-		p.Parent=folder
+		if c.decor[id] then
+			Art.create(id,Base.origin(s.slot)+Vector3.new(if n%2==0 then 27 else -27,1.5,-24+math.floor((n-1)/2)*9),folder)
+		end
 	end
 end
 return Base
