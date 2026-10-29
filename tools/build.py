@@ -49,9 +49,8 @@ def build():
         for row in range(3):
             for col in range(3):
                 ET.SubElement(cf, f'R{row}{col}').text = str(int(row == col))
-        color = ET.SubElement(props, 'Color3', name='Color')
-        for key, value in zip(('R', 'G', 'B'), part['color']):
-            ET.SubElement(color, key).text = str(value / 255)
+        red, green, blue = part['color']
+        prop(props, 'Color3uint8', 'Color3uint8', (red << 16) | (green << 8) | blue)
         prop(props, 'token', 'TopSurface', 0)
         prop(props, 'token', 'BottomSurface', 0)
         if part.get('class') == 'SpawnLocation':
@@ -67,7 +66,8 @@ def build():
                                       ('server', server, 'Script'),
                                       ('client', client, 'LocalScript')]:
         for path in sorted((ROOT / 'src' / folder).glob('*.luau')):
-            _, props = item(destination, cls, path.stem)
+            is_entry = path.stem == 'Bootstrap'
+            _, props = item(destination, cls if is_entry or folder == 'shared' else 'ModuleScript', path.stem)
             prop(props, 'ProtectedString', 'Source', path.read_text(encoding='utf-8'))
     OUTPUT.parent.mkdir(exist_ok=True)
     ET.indent(root)

@@ -22,10 +22,19 @@ class PlaceBuildTests(unittest.TestCase):
         self.assertIn('ShoreArt', names)
         self.assertIn('WelcomeSpawn', names)
         self.assertIn('RecyclerSample', names)
+        for name, expected_class in [('Domain', 'ModuleScript'),
+                                     ('SceneRenderer', 'ModuleScript'),
+                                     ('Balance', 'ModuleScript')]:
+            obj = next(obj for obj in objects
+                       if obj.findtext('Properties/string[@name="Name"]') == name)
+            self.assertEqual(obj.get('class'), expected_class)
+        entries = [obj.get('class') for obj in objects
+                   if obj.findtext('Properties/string[@name="Name"]') == 'Bootstrap']
+        self.assertCountEqual(entries, ['Script', 'LocalScript'])
         sources = [obj.findtext('Properties/ProtectedString[@name="Source"]')
                    for obj in objects if obj.get('class') in
                    ('Script', 'LocalScript', 'ModuleScript')]
-        self.assertEqual(len(sources), 3)
+        self.assertEqual(len(sources), len(list((ROOT / 'src').rglob('*.luau'))))
         for path in (ROOT / 'src').rglob('*.luau'):
             self.assertIn(path.read_text(encoding='utf-8'), sources)
         config = (ROOT / 'src/shared/BuildConfig.luau').read_text(encoding='utf-8')

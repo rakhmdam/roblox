@@ -36,11 +36,7 @@
             <R21>0</R21>
             <R22>1</R22>
           </CoordinateFrame>
-          <Color3 name="Color">
-            <R>0.23921568627450981</R>
-            <G>0.615686274509804</G>
-            <B>0.7098039215686275</B>
-          </Color3>
+          <Color3uint8 name="Color3uint8">4038069</Color3uint8>
           <token name="TopSurface">0</token>
           <token name="BottomSurface">0</token>
         </Properties>
@@ -69,11 +65,7 @@
             <R21>0</R21>
             <R22>1</R22>
           </CoordinateFrame>
-          <Color3 name="Color">
-            <R>0.9215686274509803</R>
-            <G>0.8274509803921568</G>
-            <B>0.6196078431372549</B>
-          </Color3>
+          <Color3uint8 name="Color3uint8">15455134</Color3uint8>
           <token name="TopSurface">0</token>
           <token name="BottomSurface">0</token>
         </Properties>
@@ -102,11 +94,7 @@
             <R21>0</R21>
             <R22>1</R22>
           </CoordinateFrame>
-          <Color3 name="Color">
-            <R>0.48627450980392156</R>
-            <G>0.6823529411764706</G>
-            <B>0.40784313725490196</B>
-          </Color3>
+          <Color3uint8 name="Color3uint8">8171112</Color3uint8>
           <token name="TopSurface">0</token>
           <token name="BottomSurface">0</token>
         </Properties>
@@ -135,11 +123,7 @@
             <R21>0</R21>
             <R22>1</R22>
           </CoordinateFrame>
-          <Color3 name="Color">
-            <R>0.8627450980392157</R>
-            <G>0.9254901960784314</G>
-            <B>0.7607843137254902</B>
-          </Color3>
+          <Color3uint8 name="Color3uint8">14478530</Color3uint8>
           <token name="TopSurface">0</token>
           <token name="BottomSurface">0</token>
           <bool name="Neutral">true</bool>
@@ -170,11 +154,7 @@
             <R21>0</R21>
             <R22>1</R22>
           </CoordinateFrame>
-          <Color3 name="Color">
-            <R>0.9098039215686274</R>
-            <G>0.8352941176470589</G>
-            <B>0.6431372549019608</B>
-          </Color3>
+          <Color3uint8 name="Color3uint8">15259044</Color3uint8>
           <token name="TopSurface">0</token>
           <token name="BottomSurface">0</token>
         </Properties>
@@ -203,11 +183,7 @@
             <R21>0</R21>
             <R22>1</R22>
           </CoordinateFrame>
-          <Color3 name="Color">
-            <R>0.2235294117647059</R>
-            <G>0.45098039215686275</G>
-            <B>0.4235294117647059</B>
-          </Color3>
+          <Color3uint8 name="Color3uint8">3765100</Color3uint8>
           <token name="TopSurface">0</token>
           <token name="BottomSurface">0</token>
         </Properties>
@@ -236,11 +212,7 @@
             <R21>0</R21>
             <R22>1</R22>
           </CoordinateFrame>
-          <Color3 name="Color">
-            <R>0.592156862745098</R>
-            <G>0.8549019607843137</G>
-            <B>0.6901960784313725</B>
-          </Color3>
+          <Color3uint8 name="Color3uint8">9951920</Color3uint8>
           <token name="TopSurface">0</token>
           <token name="BottomSurface">0</token>
         </Properties>
@@ -269,11 +241,7 @@
             <R21>0</R21>
             <R22>1</R22>
           </CoordinateFrame>
-          <Color3 name="Color">
-            <R>0.6823529411764706</R>
-            <G>0.4588235294117647</G>
-            <B>0.2823529411764706</B>
-          </Color3>
+          <Color3uint8 name="Color3uint8">11433288</Color3uint8>
           <token name="TopSurface">0</token>
           <token name="BottomSurface">0</token>
         </Properties>
@@ -302,11 +270,7 @@
             <R21>0</R21>
             <R22>1</R22>
           </CoordinateFrame>
-          <Color3 name="Color">
-            <R>0.788235294117647</R>
-            <G>0.7215686274509804</G>
-            <B>0.8666666666666667</B>
-          </Color3>
+          <Color3uint8 name="Color3uint8">13220061</Color3uint8>
           <token name="TopSurface">0</token>
           <token name="BottomSurface">0</token>
         </Properties>
@@ -335,11 +299,7 @@
             <R21>0</R21>
             <R22>1</R22>
           </CoordinateFrame>
-          <Color3 name="Color">
-            <R>0.6666666666666666</R>
-            <G>0.788235294117647</G>
-            <B>0.8196078431372549</B>
-          </Color3>
+          <Color3uint8 name="Color3uint8">11192785</Color3uint8>
           <token name="TopSurface">0</token>
           <token name="BottomSurface">0</token>
         </Properties>
@@ -368,11 +328,7 @@
             <R21>0</R21>
             <R22>1</R22>
           </CoordinateFrame>
-          <Color3 name="Color">
-            <R>0.6352941176470588</R>
-            <G>0.45098039215686275</G>
-            <B>0.2980392156862745</B>
-          </Color3>
+          <Color3uint8 name="Color3uint8">10646348</Color3uint8>
           <token name="TopSurface">0</token>
           <token name="BottomSurface">0</token>
         </Properties>
@@ -401,11 +357,7 @@
             <R21>0</R21>
             <R22>1</R22>
           </CoordinateFrame>
-          <Color3 name="Color">
-            <R>0.5568627450980392</R>
-            <G>0.4</G>
-            <B>0.27058823529411763</B>
-          </Color3>
+          <Color3uint8 name="Color3uint8">9332293</Color3uint8>
           <token name="TopSurface">0</token>
           <token name="BottomSurface">0</token>
         </Properties>
@@ -434,11 +386,7 @@
             <R21>0</R21>
             <R22>1</R22>
           </CoordinateFrame>
-          <Color3 name="Color">
-            <R>0.27450980392156865</R>
-            <G>0.5019607843137255</G>
-            <B>0.3333333333333333</B>
-          </Color3>
+          <Color3uint8 name="Color3uint8">4620373</Color3uint8>
           <token name="TopSurface">0</token>
           <token name="BottomSurface">0</token>
         </Properties>
@@ -467,11 +415,7 @@
             <R21>0</R21>
             <R22>1</R22>
           </CoordinateFrame>
-          <Color3 name="Color">
-            <R>0.5568627450980392</R>
-            <G>0.4</G>
-            <B>0.27058823529411763</B>
-          </Color3>
+          <Color3uint8 name="Color3uint8">9332293</Color3uint8>
           <token name="TopSurface">0</token>
           <token name="BottomSurface">0</token>
         </Properties>
@@ -500,11 +444,7 @@
             <R21>0</R21>
             <R22>1</R22>
           </CoordinateFrame>
-          <Color3 name="Color">
-            <R>0.34901960784313724</R>
-            <G>0.5725490196078431</G>
-            <B>0.3568627450980392</B>
-          </Color3>
+          <Color3uint8 name="Color3uint8">5870171</Color3uint8>
           <token name="TopSurface">0</token>
           <token name="BottomSurface">0</token>
         </Properties>
@@ -521,16 +461,49 @@
       </Properties>
       <Item class="ModuleScript" referent="RBX23">
         <Properties>
+          <string name="Name">Balance</string>
+          <ProtectedString name="Source">--!strict
+return table.freeze({
+	version = "balance-0.1.0",
+	toolPower = {4, 6}, toolPrices = {0, 30}, bagCapacity = 12,
+	manualInterval = 0.8, slimeInterval = 1.2, slimePower = 2,
+	manualRange = 14, stationRange = 16, respawnSeconds = 10,
+	coinLimit = 1000000000, materialLimit = 1000000,
+	rarityNames = {"Обычный", "Необычный", "Редкий", "Эпический", "Легендарный"},
+	rarityWeights = {6000, 2500, 1000, 400, 100},
+	hpMultipliers = {1, 1.3, 1.8, 2.6, 4},
+	coinMultipliers = {1, 1.6, 2.5, 4, 7}, materialAmounts = {1, 2, 3, 5, 8},
+})
+</ProtectedString>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="RBX24">
+        <Properties>
           <string name="Name">BuildConfig</string>
           <ProtectedString name="Source">--!strict
 -- This build deliberately has no DataStore or purchase integration.
 return table.freeze({
-	buildVersion = "foundation-0.0.1",
+	buildVersion = "shore-slice-0.0.2",
 	environment = "Test",
 	balanceVersion = "balance-0.1.0",
 	persistenceEnabled = false,
 	monetizationEnabled = false,
 })
+</ProtectedString>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="RBX25">
+        <Properties>
+          <string name="Name">WorldConfig</string>
+          <ProtectedString name="Source">--!strict
+local positions: {{number}} = {}
+for row = 0, 5 do
+	for column = 0, 5 do
+		local x = if column &lt; 3 then -25 + column * 8 else 9 + (column - 3) * 8
+		table.insert(positions, {x, 2.8, -25 + row * 6})
+	end
+end
+return table.freeze({positions=positions})
 </ProtectedString>
         </Properties>
       </Item>
@@ -540,18 +513,344 @@ return table.freeze({
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Script" referent="RBX24">
+    <Item class="Script" referent="RBX26">
       <Properties>
         <string name="Name">Bootstrap</string>
         <ProtectedString name="Source">--!strict
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("BuildConfig"))
+local HttpService = game:GetService("HttpService")
+local shared = ReplicatedStorage:WaitForChild("Shared")
+local config = require(shared:WaitForChild("BuildConfig"))
+local balance = require(shared:WaitForChild("Balance"))
+local world = require(shared:WaitForChild("WorldConfig"))
+local Domain = require(script.Parent:WaitForChild("Domain"))
+type Session = {
+	profile: Domain.Profile, nodes: {Domain.Node}, nonce: string,
+	selected: number?, revision: number, tokens: number, tokenAt: number,
+	seen: {[string]: boolean}, requestOrder: {string}, ready: boolean,
+}
+local sessions: {[Player]: Session} = {}
+local rng = Random.new()
+local art = workspace:WaitForChild("ShoreArt")
+assert(config.environment == "Test" and not config.persistenceEnabled and not config.monetizationEnabled)
+local remote = Instance.new("RemoteEvent")
+remote.Name = "Session"
+remote.Parent = ReplicatedStorage
 
-assert(config.environment == "Test", "Foundation build must run in Test")
-assert(not config.persistenceEnabled and not config.monetizationEnabled)
-assert(workspace:WaitForChild("ShoreArt"):FindFirstChild("WelcomeSpawn"))
-ReplicatedStorage:SetAttribute("BuildVersion", config.buildVersion)
-print("Slime Salvage foundation ready; persistence and purchases disabled")
+local function position(id: number): Vector3
+	local v = world.positions[id]
+	return Vector3.new(v[1], v[2], v[3])
+end
+
+local function makeNode(id: number, profile: Domain.Profile): Domain.Node
+	local rarity = Domain.chooseRarity(rng:NextInteger(1, 10000), balance.rarityWeights)
+	if profile.collected &lt; 4 then rarity = 1 end
+	return Domain.newNode(id, rarity, if rng:NextNumber() &lt; 0.7 then "Plastic" else "Metal", balance)
+end
+
+local function send(player: Player, session: Session, errorCode: string?)
+	if not session.ready then return end
+	session.revision += 1
+	remote:FireClient(player, {revision=session.revision, nonce=session.nonce,
+		profile=session.profile, nodes=session.nodes, selected=session.selected, errorCode=errorCode})
+end
+
+local function rootFor(player: Player): BasePart?
+	local character = player.Character
+	local humanoid = if character then character:FindFirstChildOfClass("Humanoid") else nil
+	local root = if character then character:FindFirstChild("HumanoidRootPart") else nil
+	if humanoid and humanoid.Health &gt; 0 and root and root:IsA("BasePart") then return root end
+	return nil
+end
+
+local function near(player: Player, target: Vector3, distance: number): boolean
+	local root = rootFor(player)
+	if not root or (root.Position - target).Magnitude &gt; distance then return false end
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = if player.Character then {player.Character} else {}
+	return workspace:Raycast(root.Position, target - root.Position, params) == nil
+end
+
+local function atStation(player: Player, name: string): boolean
+	local root = rootFor(player)
+	local station = art:FindFirstChild(name)
+	return root ~= nil and station ~= nil and station:IsA("BasePart")
+		and (root.Position - station.Position).Magnitude &lt;= balance.stationRange
+end
+
+local function add(player: Player)
+	if sessions[player] then return end
+	local now = os.clock()
+	local profile = Domain.newProfile(now)
+	local nodes = {}
+	for id = 1, #world.positions do nodes[id] = makeNode(id, profile) end
+	sessions[player] = {profile=profile, nodes=nodes, nonce=HttpService:GenerateGUID(false),
+		selected=nil, revision=0, tokens=10, tokenAt=now, seen={}, requestOrder={}, ready=false}
+end
+Players.PlayerAdded:Connect(add)
+Players.PlayerRemoving:Connect(function(player) sessions[player] = nil end)
+for _, player in Players:GetPlayers() do add(player) end
+
+remote.OnServerEvent:Connect(function(player: Player, request: any)
+	local s = sessions[player]
+	if not s then return end
+	local now = os.clock()
+	s.tokens = math.min(10, s.tokens + (now - s.tokenAt) * 5)
+	s.tokenAt = now
+	if s.tokens &lt; 1 then return end
+	s.tokens -= 1
+	if typeof(request) ~= "table" then return end
+	local keys = 0
+	for key in request do
+		keys += 1
+		if key ~= "action" and key ~= "requestId" and key ~= "nonce" and key ~= "value"
+			and key ~= "protocolVersion" then return end
+	end
+	if keys &gt; 5 or request.protocolVersion ~= 1 or typeof(request.action) ~= "string"
+		or #request.action &gt; 24 or typeof(request.requestId) ~= "string"
+		or #request.requestId &gt; 64 or not string.match(request.requestId, "^[%w%-]+$") then return end
+	if request.action == "Sync" then s.ready = true; send(player, s); return end
+	if request.nonce ~= s.nonce then send(player, s, "SessionExpired"); return end
+	if s.seen[request.requestId] then send(player, s); return end
+	s.seen[request.requestId] = true
+	table.insert(s.requestOrder, request.requestId)
+	if #s.requestOrder &gt; 128 then s.seen[table.remove(s.requestOrder, 1)] = nil end
+	local p = s.profile
+	local err: string? = nil
+	if request.action == "Play" then
+		if not p.playing then p.lastManual = now; p.lastSlime = now end
+		p.playing = true
+	elseif request.action == "Pause" then p.playing = false; s.selected = nil
+	elseif not p.playing or not rootFor(player) then err = "NotPlaying"
+	elseif request.action == "Skip" then Domain.skip(p, HttpService:GenerateGUID(false))
+	elseif request.action == "Cancel" then s.selected = nil
+	elseif request.action == "Select" then
+		local id = request.value
+		if typeof(id) ~= "number" or id ~= id or id % 1 ~= 0 or id &lt; 1 or id &gt; #s.nodes then err = "NoTarget"
+		elseif not near(player, position(id), balance.manualRange) then err = "OutOfRange"
+		elseif s.nodes[id].hp &lt;= 0 then err = "NoTarget"
+		elseif p.count &gt;= balance.bagCapacity then err = "BagFull"
+		else
+			s.selected = if s.selected == id then nil else id
+			if s.selected then Domain.select(p) end
+		end
+	elseif request.action == "Process" then
+		s.selected = nil
+		if not atStation(player, "RecyclerSample") then err = "StationRange"
+		else local _, reason = Domain.process(p, balance); err = reason end
+	elseif request.action == "Upgrade" then
+		s.selected = nil
+		if not atStation(player, "WorkshopSample") then err = "StationRange"
+		elseif typeof(request.value) ~= "number" then err = "StaleTier"
+		else local _, reason = Domain.upgrade(p, request.value, balance); err = reason end
+	elseif request.action == "Nursery" then
+		s.selected = nil
+		if not atStation(player, "NurserySample") then err = "StationRange"
+		else local _, reason = Domain.viewNursery(p); err = reason end
+	elseif request.action == "Equip" then
+		if typeof(request.value) ~= "boolean" or not p.slimeUid then err = "NoSlime"
+		else p.equipped = request.value; s.selected = nil end
+	else err = "UnknownAction" end
+	send(player, s, err)
+end)
+
+task.spawn(function()
+	local lastSend = 0
+	while true do
+		task.wait(0.1)
+		local now = os.clock()
+		local publish = now - lastSend &gt;= 0.2
+		if publish then lastSend = now end
+		for player, s in sessions do
+			local changed = false
+			for id, node in s.nodes do
+				if node.hp &lt;= 0 and now &gt;= node.readyAt then
+					s.nodes[id] = makeNode(id, s.profile)
+					changed = true
+				end
+			end
+			local id = s.selected
+			if id then
+				if not s.profile.playing or not near(player, position(id), balance.manualRange) then
+					s.selected = nil; changed = true
+				else
+					local node = s.nodes[id]
+					local uid = s.profile.slimeUid or HttpService:GenerateGUID(false)
+					Domain.hit(s.profile, node, now, true, uid, balance)
+					Domain.hit(s.profile, node, now, false, uid, balance)
+					if node.hp &lt;= 0 or s.profile.count &gt;= balance.bagCapacity then s.selected = nil end
+					if publish or not s.selected then changed = true end
+				end
+			end
+			if changed then send(player, s) end
+		end
+	end
+end)
+print("Slime Salvage shore slice ready; session data only")
+</ProtectedString>
+      </Properties>
+    </Item>
+    <Item class="ModuleScript" referent="RBX27">
+      <Properties>
+        <string name="Name">Domain</string>
+        <ProtectedString name="Source">--!strict
+-- Pure session economy. No Roblox services, yielding, network, or persistence.
+export type Cargo = { count: number, coins: number, amount: number, material: string }
+export type Profile = {
+	coins: number, materials: {[string]: number}, cargo: {[string]: Cargo},
+	count: number, processed: number, fragmentRemainder: number, fragments: number,
+	toolTier: number, collected: number, tutorial: number, skipped: boolean,
+	slimeUid: string?, equipped: boolean, starterGranted: boolean,
+	bonusGranted: boolean, teamSlots: number, playing: boolean,
+	lastManual: number, lastSlime: number,
+}
+export type Node = {
+	id: number, hp: number, maxHp: number, rarity: number, material: string,
+	coins: number, amount: number, readyAt: number, helperWorked: boolean,
+}
+local Domain = {}
+
+function Domain.newProfile(now: number): Profile
+	return { coins=0, materials={Plastic=0, Metal=0, Crystal=0}, cargo={},
+		count=0, processed=0, fragmentRemainder=0, fragments=0, toolTier=1,
+		collected=0, tutorial=1, skipped=false, slimeUid=nil, equipped=false,
+		starterGranted=false, bonusGranted=false, teamSlots=1, playing=false,
+		lastManual=now, lastSlime=now }
+end
+
+function Domain.newNode(id: number, rarity: number, material: string, balance: any): Node
+	assert(rarity &gt;= 1 and rarity &lt;= 5 and rarity % 1 == 0)
+	local hp = math.ceil(12 * balance.hpMultipliers[rarity])
+	return {id=id, hp=hp, maxHp=hp, rarity=rarity, material=material,
+		coins=math.floor(6 * balance.coinMultipliers[rarity]),
+		amount=balance.materialAmounts[rarity], readyAt=0, helperWorked=false}
+end
+
+function Domain.chooseRarity(roll: number, weights: {number}): number
+	assert(roll &gt;= 1 and roll &lt;= 10000 and roll % 1 == 0)
+	local edge = 0
+	for i, weight in weights do
+		edge += weight
+		if roll &lt;= edge then return i end
+	end
+	error("Invalid rarity weights")
+end
+
+function Domain.select(profile: Profile)
+	if profile.tutorial == 1 then profile.tutorial = 2 end
+end
+
+local function grantStarter(profile: Profile, uid: string)
+	if profile.starterGranted then return end
+	profile.starterGranted = true
+	profile.slimeUid = uid
+	profile.equipped = true
+end
+
+function Domain.skip(profile: Profile, uid: string)
+	if profile.tutorial &gt;= 7 then return end
+	if not profile.bonusGranted and profile.coins &gt; 1000000000 - 15 then return end
+	grantStarter(profile, uid)
+	if not profile.bonusGranted then
+		profile.coins += 15
+		profile.bonusGranted = true
+	end
+	profile.teamSlots = 2
+	profile.tutorial = 7
+	profile.skipped = true
+end
+
+function Domain.hit(profile: Profile, node: Node, now: number, helper: boolean,
+	uid: string, balance: any): (boolean, string?)
+	if not profile.playing or node.hp &lt;= 0 then return false, "NoTarget" end
+	if profile.count &gt;= balance.bagCapacity then return false, "BagFull" end
+	if helper then
+		if not profile.equipped or not profile.slimeUid then return false, "NoSlime" end
+		if now - profile.lastSlime &lt; balance.slimeInterval then return false, "Cooldown" end
+		profile.lastSlime = now
+		node.hp = math.max(0, node.hp - balance.slimePower)
+		node.helperWorked = true
+	else
+		if now - profile.lastManual &lt; balance.manualInterval then return false, "Cooldown" end
+		profile.lastManual = now
+		node.hp = math.max(0, node.hp - balance.toolPower[profile.toolTier])
+	end
+	if node.hp &gt; 0 then return true, nil end
+	local key = "shore/" .. node.material .. "/" .. tostring(node.rarity)
+	local group = profile.cargo[key]
+	if not group then
+		group = {count=0, coins=node.coins, amount=node.amount, material=node.material}
+		profile.cargo[key] = group
+	end
+	group.count += 1
+	profile.count += 1
+	profile.collected += 1
+	node.readyAt = now + balance.respawnSeconds
+	if profile.tutorial == 2 and profile.collected &gt;= 3 then
+		grantStarter(profile, uid)
+		profile.tutorial = 3
+	elseif profile.tutorial == 3 and node.helperWorked then
+		profile.tutorial = 4
+	end
+	return true, nil
+end
+
+function Domain.preview(profile: Profile): (number, {[string]: number})
+	local coins = 0
+	local materials: {[string]: number} = {Plastic=0, Metal=0, Crystal=0}
+	for _, group in profile.cargo do
+		coins += group.count * group.coins
+		materials[group.material] += group.count * group.amount
+	end
+	return coins, materials
+end
+
+function Domain.process(profile: Profile, balance: any): (boolean, string?)
+	if profile.count == 0 then return false, "EmptyBag" end
+	local coins, materials = Domain.preview(profile)
+	local bonus = if profile.tutorial == 4 and not profile.bonusGranted then 15 else 0
+	local fragments = math.floor((profile.fragmentRemainder + profile.count) / 15)
+	if profile.coins + coins + bonus &gt; balance.coinLimit
+		or profile.fragments + fragments &gt; balance.materialLimit then return false, "Limit" end
+	for material, amount in materials do
+		if profile.materials[material] + amount &gt; balance.materialLimit then return false, "Limit" end
+	end
+	-- Everything validated before the first mutation.
+	profile.coins += coins + bonus
+	for material, amount in materials do profile.materials[material] += amount end
+	profile.fragments += fragments
+	profile.fragmentRemainder = (profile.fragmentRemainder + profile.count) % 15
+	profile.processed += profile.count
+	profile.count = 0
+	profile.cargo = {}
+	if bonus &gt; 0 then profile.bonusGranted = true end
+	if profile.tutorial == 4 then profile.tutorial = 5 end
+	return true, nil
+end
+
+function Domain.upgrade(profile: Profile, expectedTier: number, balance: any): (boolean, string?)
+	if profile.tutorial &lt; 5 then return false, "FinishTutorialStep" end
+	if expectedTier ~= profile.toolTier then return false, "StaleTier" end
+	local nextTier = profile.toolTier + 1
+	local price = balance.toolPrices[nextTier]
+	if not price then return false, "MaxTier" end
+	if profile.coins &lt; price then return false, "NotEnoughCoins" end
+	profile.coins -= price
+	profile.toolTier = nextTier
+	if profile.tutorial == 5 then profile.tutorial = 6 end
+	return true, nil
+end
+
+function Domain.viewNursery(profile: Profile): (boolean, string?)
+	if profile.tutorial ~= 6 then return false, "FinishTutorialStep" end
+	profile.tutorial = 7
+	profile.teamSlots = 2
+	return true, nil
+end
+
+return Domain
 </ProtectedString>
       </Properties>
     </Item>
@@ -564,14 +863,30 @@ print("Slime Salvage foundation ready; persistence and purchases disabled")
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="LocalScript" referent="RBX25">
+      <Item class="LocalScript" referent="RBX28">
         <Properties>
           <string name="Name">Bootstrap</string>
           <ProtectedString name="Source">--!strict
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
 local config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("BuildConfig"))
+local balance = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Balance"))
+local Renderer = require(script.Parent:WaitForChild("SceneRenderer"))
+local remote = ReplicatedStorage:WaitForChild("Session") :: RemoteEvent
 local player = Players.LocalPlayer
+local snapshot: any = nil
+local revision = 0
+local lastRequestAt = 0
+local render = Renderer.start()
+
+local function request(action: string, value: any?)
+	if os.clock() - lastRequestAt &lt; 0.22 then return end
+	lastRequestAt = os.clock()
+	remote:FireServer({protocolVersion=1, action=action, value=value,
+		requestId=HttpService:GenerateGUID(false), nonce=if snapshot then snapshot.nonce else nil})
+end
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "BuildStatus"
@@ -579,17 +894,282 @@ gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 local status = Instance.new("TextLabel")
 status.Name = "Status"
-status.Size = UDim2.new(1, -32, 0, 72)
+status.Size = UDim2.new(1, -32, 0, 102)
 status.Position = UDim2.fromOffset(16, 12)
 status.BackgroundColor3 = Color3.fromRGB(30, 53, 54)
 status.BackgroundTransparency = 0.15
 status.TextColor3 = Color3.fromRGB(240, 242, 220)
 status.TextWrapped = true
-status.TextSize = 18
+status.TextSize = 15
 status.Font = Enum.Font.GothamMedium
 status.Text = "SLIME SALVAGE · " .. config.buildVersion
-	.. "\nТестовая сцена. Сбор и сохранения ещё не подключены."
+	.. "\nПодключение… Прогресс этой сборки не сохраняется."
 status.Parent = gui
+
+local message = status:Clone()
+message.Name = "Message"
+message.Size = UDim2.new(1, -32, 0, 55)
+message.Position = UDim2.fromOffset(16, 174)
+message.Text = ""
+message.Visible = false
+message.Parent = gui
+
+local menu = Instance.new("Frame")
+menu.Name = "Menu"
+menu.AnchorPoint = Vector2.new(0.5, 0.5)
+menu.Position = UDim2.fromScale(0.5, 0.5)
+menu.Size = UDim2.fromOffset(280, 150)
+menu.BackgroundColor3 = Color3.fromRGB(30, 53, 54)
+menu.Parent = gui
+local list = Instance.new("UIListLayout")
+list.Padding = UDim.new(0, 4)
+list.Parent = menu
+
+local function button(parent: Instance, text: string, callback: () -&gt; ()): TextButton
+	local b = Instance.new("TextButton")
+	b.Size = UDim2.new(1, 0, 0, 46)
+	b.BackgroundColor3 = Color3.fromRGB(152, 207, 137)
+	b.TextColor3 = Color3.fromRGB(26, 48, 43)
+	b.Text = text
+	b.TextSize = 15
+	b.TextWrapped = true
+	b.Font = Enum.Font.GothamMedium
+	b.Activated:Connect(callback)
+	b.Parent = parent
+	return b
+end
+local play = button(menu, "Играть", function() request("Play") end)
+button(menu, "Что нового", function()
+	message.Visible = true
+	message.Text = "Берег: сбор, Росток, переработка, инструмент II. Сохранений пока нет."
+end)
+button(menu, "Как играть", function()
+	message.Visible = true
+	message.Text = "Нажми на хлам рядом. У станций появятся действия. Повторный выбор отменяет сбор."
+end)
+
+local actions = Instance.new("Frame")
+actions.Size = UDim2.new(1, -32, 0, 48)
+actions.Position = UDim2.fromOffset(16, 118)
+actions.BackgroundTransparency = 1
+actions.Visible = false
+actions.Parent = gui
+local actionList = Instance.new("UIGridLayout")
+actionList.CellSize = UDim2.new(0.25, -4, 0, 48)
+actionList.CellPadding = UDim2.fromOffset(4, 0)
+actionList.Parent = actions
+local stationAction: string? = nil
+local station = button(actions, "Подойди к станции", function()
+	if stationAction then request(stationAction, if stationAction == "Upgrade" then snapshot.profile.toolTier else nil) end
+end)
+local equip = button(actions, "Росток", function()
+	request("Equip", not snapshot.profile.equipped)
+end)
+local skip = button(actions, "Пропустить обучение", function() request("Skip") end)
+button(actions, "Меню / остановить сбор", function() request("Pause") end)
+
+local tasks = {
+	"Выбери хлам на берегу: подойди и нажми.",
+	"Собери три предмета — получишь Ростка.",
+	"Собери один предмет вместе с Ростком.",
+	"Подойди к зелёному переработчику и продай груз.",
+	"Подойди к коричневой мастерской: инструмент II за 30 монет.",
+	"Посети фиолетовый питомник и посмотри вероятности.",
+	"Обучение завершено! Бухта и дальнейшие улучшения появятся позже.",
+}
+local errors: {[string]: string} = {
+	OutOfRange="Подойди ближе к ресурсу (до 14 studs).", BagFull="Рюкзак полон — отнеси груз переработчику.",
+	StationRange="Подойди ближе к станции.", EmptyBag="Рюкзак пуст.",
+	NotEnoughCoins="Не хватает монет.", MaxTier="В этом срезе доступен инструмент до уровня II.",
+	FinishTutorialStep="Сначала выполни текущий шаг обучения.", Limit="Лимит склада: груз не списан.",
+	NotPlaying="Нажми «Играть» и дождись появления персонажа.",
+}
+remote.OnClientEvent:Connect(function(state: any)
+	if state.revision &lt;= revision then return end
+	revision = state.revision
+	snapshot = state
+	render(state)
+	local p = state.profile
+	play.Text = "Играть"
+	menu.Visible = not p.playing
+	actions.Visible = p.playing
+	local value = 0
+	for _, group in p.cargo do value += group.count * group.coins end
+	status.Text = "SLIME SALVAGE · Зелёный берег · " .. tostring(p.coins) .. " монет"
+		.. " · Рюкзак " .. tostring(p.count) .. "/12 (" .. tostring(value) .. " монет)"
+		.. "\n" .. tasks[p.tutorial] .. "\nВнутренний тест: прогресс не сохраняется."
+	equip.Text = if p.equipped then "Росток: убрать из команды" else "Росток: в команду"
+	equip.Visible = p.slimeUid ~= nil
+	skip.Visible = p.tutorial &lt; 7
+	if state.errorCode then
+		message.Visible = true
+		message.Text = errors[state.errorCode] or "Действие отклонено. Повтори после обновления состояния."
+		task.delay(4, function() if snapshot == state then message.Visible = false end end)
+	elseif p.playing then message.Visible = false end
+	if p.tutorial == 7 and stationAction == "Nursery" then
+		message.Visible = true
+		message.Text = "Питомник (покупка ещё недоступна): Росток 55%, Капля 27%, Моховик 12%, Пыльцевик 5%, Солнечный 1%."
+	end
+end)
+
+local function selectAt(screenPosition: Vector2)
+	if not snapshot or not snapshot.profile.playing then return end
+	local camera = workspace.CurrentCamera
+	if not camera then return end
+	local ray = camera:ViewportPointToRay(screenPosition.X, screenPosition.Y)
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Include
+	params.FilterDescendantsInstances = {workspace:WaitForChild("PersonalResources")}
+	local hit = workspace:Raycast(ray.Origin, ray.Direction * 200, params)
+	if hit then request("Select", hit.Instance:GetAttribute("NodeId")) end
+end
+UserInputService.InputBegan:Connect(function(input, processed)
+	if processed then return end
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		selectAt(Vector2.new(input.Position.X, input.Position.Y))
+	elseif input.KeyCode == Enum.KeyCode.E and stationAction and snapshot then
+		request(stationAction, if stationAction == "Upgrade" then snapshot.profile.toolTier else nil)
+	end
+end)
+UserInputService.TouchTapInWorld:Connect(function(position, processed)
+	if not processed then selectAt(position) end
+end)
+
+task.spawn(function()
+	while true do
+		task.wait(0.3)
+		if not snapshot then request("Sync"); continue end
+		local root = if player.Character then player.Character:FindFirstChild("HumanoidRootPart") else nil
+		local art = workspace:FindFirstChild("ShoreArt")
+		stationAction = nil
+		local closest = balance.stationRange
+		if root and root:IsA("BasePart") and art then
+			for name, action in {RecyclerSample="Process", WorkshopSample="Upgrade", NurserySample="Nursery"} do
+				local part = art:FindFirstChild(name)
+				if part and part:IsA("BasePart") then
+					local distance = (root.Position - part.Position).Magnitude
+					if distance &lt; closest then closest = distance; stationAction = action end
+				end
+			end
+		end
+		station.Visible = stationAction ~= nil
+		station.Text = if stationAction == "Process" then "E · Переработать весь груз"
+			elseif stationAction == "Upgrade" then "E · Инструмент II: 30 монет"
+			else "E · Питомник: вероятности"
+	end
+end)
+</ProtectedString>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="RBX29">
+        <Properties>
+          <string name="Name">SceneRenderer</string>
+          <ProtectedString name="Source">--!strict
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local shared = game:GetService("ReplicatedStorage"):WaitForChild("Shared")
+local world = require(shared:WaitForChild("WorldConfig"))
+local balance = require(shared:WaitForChild("Balance"))
+local Renderer = {}
+
+function Renderer.start()
+	local folder = Instance.new("Folder")
+	folder.Name = "PersonalResources"
+	folder.Parent = workspace
+	local nodes: {[number]: Part} = {}
+	local labels: {[number]: TextLabel} = {}
+	local billboards: {[number]: BillboardGui} = {}
+	local selection = Instance.new("Highlight")
+	selection.FillTransparency = 0.8
+	selection.OutlineColor = Color3.fromRGB(255, 235, 148)
+	selection.Parent = folder
+	for id, v in world.positions do
+		local part = Instance.new("Part")
+		part.Name = "Junk_" .. tostring(id)
+		part.Size = Vector3.new(2.6, 2.1, 2.6)
+		part.Position = Vector3.new(v[1], v[2], v[3])
+		part.Anchored = true
+		part.CanCollide = false
+		part:SetAttribute("NodeId", id)
+		part.Parent = folder
+		local billboard = Instance.new("BillboardGui")
+		billboard.Size = UDim2.fromOffset(170, 44)
+		billboard.StudsOffset = Vector3.new(0, 2.5, 0)
+		billboard.MaxDistance = 26
+		billboard.AlwaysOnTop = true
+		billboard.Parent = part
+		local label = Instance.new("TextLabel")
+		label.Size = UDim2.fromScale(1, 1)
+		label.BackgroundColor3 = Color3.fromRGB(29, 50, 52)
+		label.BackgroundTransparency = 0.15
+		label.TextColor3 = Color3.new(1, 1, 1)
+		label.TextSize = 13
+		label.Font = Enum.Font.GothamMedium
+		label.Parent = billboard
+		nodes[id] = part
+		labels[id] = label
+		billboards[id] = billboard
+	end
+	local slime = Instance.new("Model")
+	slime.Name = "Росток"
+	local body = Instance.new("Part")
+	body.Name = "Body"
+	body.Shape = Enum.PartType.Ball
+	body.Size = Vector3.new(2.7, 2, 2.5)
+	body.Color = Color3.fromRGB(146, 221, 119)
+	body.Material = Enum.Material.SmoothPlastic
+	body.Anchored = true
+	body.CanCollide = false
+	body.CanQuery = false
+	body.Parent = slime
+	for _, x in {-0.5, 0.5} do
+		local eye = body:Clone()
+		eye.Name = "Eye"
+		eye.Size = Vector3.new(0.23, 0.35, 0.2)
+		eye.Color = Color3.fromRGB(28, 50, 48)
+		eye.Position = Vector3.new(x, 0.2, -1.12)
+		eye.Parent = slime
+	end
+	local leaf = body:Clone()
+	leaf.Name = "Leaf"
+	leaf.Size = Vector3.new(0.5, 1, 0.3)
+	leaf.Position = Vector3.new(0.3, 1.2, 0)
+	leaf.Color = Color3.fromRGB(48, 137, 79)
+	leaf.Parent = slime
+	slime.PrimaryPart = body
+	local active = false
+	local selected: number? = nil
+	RunService.RenderStepped:Connect(function(dt)
+		if not active then return end
+		local character = Players.LocalPlayer.Character
+		local root = if character then character:FindFirstChild("HumanoidRootPart") else nil
+		if not root or not root:IsA("BasePart") then slime.Parent = nil; return end
+		slime.Parent = folder
+		local destination = root.Position + Vector3.new(3, -1.8, 2)
+		if selected then destination = nodes[selected].Position + Vector3.new(2, 0.2, 0) end
+		destination += Vector3.new(0, math.abs(math.sin(os.clock() * 5)) * 0.4, 0)
+		slime:PivotTo(slime:GetPivot():Lerp(CFrame.new(destination), 1 - math.exp(-dt * 8)))
+	end)
+	return function(snapshot: any)
+		active = snapshot.profile.equipped and snapshot.profile.slimeUid ~= nil
+		if not active then slime.Parent = nil end
+		selected = snapshot.selected
+		selection.Adornee = if selected then nodes[selected] else nil
+		for _, node in snapshot.nodes do
+			local part = nodes[node.id]
+			local alive = node.hp &gt; 0
+			part.Transparency = if alive then 0 else 1
+			part.CanQuery = alive
+			part.Color = if node.material == "Metal" then Color3.fromRGB(152, 176, 189)
+				else Color3.fromRGB(222, 179, 112)
+			billboards[node.id].Enabled = alive
+			labels[node.id].Text = balance.rarityNames[node.rarity] .. " · " .. node.material
+				.. "\n" .. tostring(math.ceil(node.hp)) .. "/" .. tostring(node.maxHp)
+		end
+	end
+end
+
+return Renderer
 </ProtectedString>
         </Properties>
       </Item>
