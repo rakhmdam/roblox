@@ -19,6 +19,10 @@ end
 function Base.paint(player: Player,s: any,c: any)
 	local model=workspace:FindFirstChild("Base"..tostring(s.slot))
 	if not model then return end
+	local signature=tostring(s.profile.base.restorationTier)
+	for slot=1,12 do signature..="/"..(s.profile.base.decorationSlots[tostring(slot)] or "-") end
+	if s.baseArtSignature==signature then return end
+	s.baseArtSignature=signature
 	model:SetAttribute("OwnerId",player.UserId); model:SetAttribute("Restoration",s.profile.base.restorationTier)
 	local garden=model:FindFirstChild("Garden")
 	if garden and garden:IsA("BasePart") then

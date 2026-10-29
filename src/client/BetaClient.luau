@@ -210,7 +210,9 @@ function Client.start()
 			button(content,t("recycle"),function() currentPanel="recycle"; renderPanel() end)
 			teamList(false)
 		elseif currentPanel=="slime" then
-			local id=selectedSlime; local s=if id then p.slimes[id] else nil
+			local id=selectedSlime
+			if not id then currentPanel="team"; renderPanel(); return end
+			local s=p.slimes[id]
 			if not s then currentPanel="team"; renderPanel(); return end
 			local species=C.species[s.speciesId]; local evo=C.evolutions[s.speciesId]
 			panelTitle.Text=slimeTitle(id)

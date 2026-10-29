@@ -19,6 +19,15 @@ function Server.start()
 	local remote=Instance.new("RemoteEvent"); remote.Name="BetaSession"; remote.Parent=ReplicatedStorage
 	local sessions: {[Player]: any}={}
 	local loading: {[Player]: boolean}={}
+	local rejected: {[Player]: number}={}
+	local function rejectLog(player: Player,code: string)
+		local now=os.clock()
+		if now-(rejected[player] or -10)>=5 then
+			rejected[player]=now
+			warn("SlimeSalvage rejected",player.UserId,code)
+			Analytics.custom(player,"RejectedRequest",Config.analyticsEnabled)
+		end
+	end
 	local random=Random.new()
 	local function integer(a: number,b: number): number return random:NextInteger(a,b) end
 	local function uid(): string return Http:GenerateGUID(false) end
@@ -120,7 +129,8 @@ function Server.start()
 				if attempt<5 then task.wait(math.min(8,2^(attempt-1))) end
 			end
 			-- Unknown write outcome remains frozen. Never roll back and let the user reroll.
-			s.blocked=err or "SaveFailed"; send(player,s,s.blocked,id)
+				s.blocked=err or "SaveFailed"; send(player,s,s.blocked,id)
+				Analytics.custom(player,"SaveFailure",Config.analyticsEnabled)
 			if player.Parent then player:Kick("Сохранение недоступно / Save unavailable. Rejoin to recover the last confirmed profile.") end
 		end)
 	end
@@ -170,12 +180,12 @@ function Server.start()
 	local transient={Sync=true,Play=true,Pause=true,Modal=true,Travel=true,VisitBase=true,ReturnHome=true,
 		SelectTarget=true,SelectEvent=true,CancelTarget=true}
 	remote.OnServerEvent:Connect(function(player: Player,r: any)
-		if not Protocol.validate(r) then return end
+		if not Protocol.validate(r) then rejectLog(player,"InvalidSchema"); return end
 		local s=sessions[player]
 		if not s then if r.action=="Sync" then task.spawn(join,player) end; return end
-		if not bucket(s,"all",12,20) then return end
+		if not bucket(s,"all",12,20) then rejectLog(player,"RateLimit"); return end
 		if r.action=="Sync" then s.ready=true; send(player,s); return end
-		if r.sessionNonce~=s.nonce then send(player,s,"SessionExpired",r.requestId); return end
+		if r.sessionNonce~=s.nonce then rejectLog(player,"SessionExpired"); send(player,s,"SessionExpired",r.requestId); return end
 		local category=if r.action=="SelectTarget" then "target" elseif transient[r.action] then "ui" else "economy"
 		if not bucket(s,category,if category=="target" then 5 elseif category=="ui" then 4 else 2,
 			if category=="target" then 10 else 4) then send(player,s,"RateLimit",r.requestId); return end
@@ -247,7 +257,7 @@ function Server.start()
 				task.wait(1)
 			end
 		end
-		sessions[player]=nil; Base.release(s.slot)
+		sessions[player]=nil; rejected[player]=nil; Base.release(s.slot)
 	end
 	Players.PlayerAdded:Connect(function(player) task.spawn(join,player) end)
 	Players.PlayerRemoving:Connect(leave)

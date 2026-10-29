@@ -125,7 +125,10 @@ function Game.apply(p: Profile, action: string, v: any, context: any, c: any): (
 		end
 		p.stats.totalProcessed+=Game.cargoCount(p); p.cargo={}
 		for tier,threshold in c.restoration do if p.stats.totalProcessed>=threshold then p.base.restorationTier=tier end end
-		if p.tutorial.step==4 then p.tutorial.grantedRewardIds.bonus=true; p.tutorial.step=5 end
+		if p.tutorial.step==4 then
+			p.tutorial.grantedRewardIds.bonus=true
+			p.tutorial.step=if p.equipment.toolTier>=2 then 6 else 5
+		end
 	elseif action=="BuyUpgrade" then
 		local kind=v.kind; local catalog=c[kind]
 		if not table.find({"tool","bag","storage"},kind) then return false,"UnknownId" end
