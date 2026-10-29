@@ -2,10 +2,14 @@
 local Players=game:GetService("Players")
 local ReplicatedStorage=game:GetService("ReplicatedStorage")
 local Input=game:GetService("UserInputService")
+local GuiService=game:GetService("GuiService")
 local Http=game:GetService("HttpService")
 local shared=ReplicatedStorage:WaitForChild("Shared")
 local C=require(shared:WaitForChild("Catalog"))
 local text=require(shared:WaitForChild("Strings"))
+local Format=require(shared:WaitForChild("Format"))
+local Metrics=require(shared:WaitForChild("Metrics"))
+local RunService=game:GetService("RunService")
 local Renderer=require(script.Parent:WaitForChild("BetaRenderer"))
 local Config=require(shared:WaitForChild("BuildConfig"))
 local Audio=require(script.Parent:WaitForChild("AudioController"))
@@ -16,6 +20,9 @@ function Client.start()
 	local renderer=Renderer.start()
 	local audio=Audio.start(Config)
 	local lastCargo=0
+	local loadFailed=false
+	local knownJunk: any=nil
+	local toastGeneration=0
 	local state: any=nil
 	local lang="ru"
 	local currentPanel=""
@@ -25,6 +32,12 @@ function Client.start()
 	local selectedSlime: string?=nil
 	local recycleSelection: {[string]: boolean}={}
 	local pending: any=nil
+	local reveal: any=nil
+	local systemMenuOpen=false
+	local frameMetrics=Metrics.new(36000)
+	if Config.environment=="Test" and Config.diagnosticsEnabled then
+		RunService.RenderStepped:Connect(function(dt) Metrics.add(frameMetrics,dt*1000) end)
+	end
 	local lastView=0
 	local panelRevision=-1
 	local lastGoal=0
@@ -47,8 +60,8 @@ function Client.start()
 	toast.Visible=false; toast.ZIndex=20; toast.Parent=gui
 	local function notify(message: string)
 		toast.Text=message; toast.Visible=true
-		local captured=message
-		task.delay(5,function() if toast.Text==captured then toast.Visible=false end end)
+		toastGeneration+=1; local captured=toastGeneration
+		task.delay(5,function() if toastGeneration==captured then toast.Visible=false end end)
 	end
 	local function request(action: string,payload: any?)
 		if action~="Sync" and not state then return end
@@ -59,6 +72,7 @@ function Client.start()
 		if not transient[action] then
 			if pending then notify(t("saving")); return end
 			pending={request=r,sentAt=os.clock()}
+			task.delay(1,function() if pending and pending.request.requestId==r.requestId then notify(t("waiting")) end end)
 		end
 		remote:FireServer(r)
 	end
@@ -67,6 +81,7 @@ function Client.start()
 		local corner=Instance.new("UICorner"); corner.CornerRadius=UDim.new(0,10); corner.Parent=f; return f
 	end
 	local function button(parent: Instance,title: string,callback: ()->(),enabled: boolean?): TextButton
+		if parent:GetAttribute("TransactionContent") and (pending or (state and state.busy)) then enabled=false end
 		local b=Instance.new("TextButton"); b.Size=UDim2.new(1,-12,0,46); b.Text=title
 		b.BackgroundColor3=if enabled==false then Color3.fromRGB(104,121,119) else Color3.fromRGB(164,213,146)
 		b.TextColor3=Color3.fromRGB(25,46,42); b.Font=Enum.Font.GothamMedium; b.TextSize=15; b.TextWrapped=true
@@ -92,10 +107,11 @@ function Client.start()
 	local content=Instance.new("ScrollingFrame"); content.Size=UDim2.new(1,-16,1,-64); content.Position=UDim2.fromOffset(8,56)
 	content.BackgroundTransparency=1; content.ScrollBarThickness=6; content.CanvasSize=UDim2.new(); content.AutomaticCanvasSize=Enum.AutomaticSize.Y
 	content.ScrollingDirection=Enum.ScrollingDirection.Y; content.Parent=panel
+	content:SetAttribute("TransactionContent",true)
 	local toolbar=frame(gui,UDim2.new(1,-24,0,48),UDim2.fromOffset(12,102))
-	local toolbarLayout=Instance.new("UIGridLayout"); toolbarLayout.CellSize=UDim2.new(1/7,-4,0,48); toolbarLayout.CellPadding=UDim2.fromOffset(4,0); toolbarLayout.Parent=toolbar
+	local toolbarLayout=Instance.new("UIGridLayout"); toolbarLayout.CellSize=UDim2.new(1/8,-4,0,48); toolbarLayout.CellPadding=UDim2.fromOffset(4,0); toolbarLayout.Parent=toolbar
 	local function layout()
-		local columns=if gui.AbsoluteSize.X<600 then 4 else 7
+		local columns=if gui.AbsoluteSize.X<600 then 4 else 8
 		local height=if columns==4 then 100 else 48
 		toolbar.Size=UDim2.new(1,-24,0,height)
 		toolbarLayout.CellSize=UDim2.new(1/columns,-4,0,48)
@@ -106,7 +122,7 @@ function Client.start()
 	local function open(name: string)
 		currentPanel=name; panel.Visible=name~=""; menu.Visible=state~=nil and not state.playing and name==""
 		toolbar.Visible=state~=nil and state.playing and name==""
-		request("Modal",{open=name~=""}); renderPanel()
+		request("Modal",{open=name~="" or systemMenuOpen}); renderPanel()
 	end
 	local close=button(panel,"×",function() open("") end)
 	close.Size=UDim2.fromOffset(110,44); close.Position=UDim2.new(1,-120,0,6)
@@ -118,7 +134,7 @@ function Client.start()
 	local function spend(title: string,action: string,payload: any)
 		confirm(title,function() request(action,payload) end)
 	end
-	local function money(price: number): string return tostring(price).." "..t("coins") end
+	local function money(price: number): string return Format.number(price).." "..t("coins") end
 	local function keys(tableValue: any): {string}
 		local ids={}; for id in tableValue do table.insert(ids,id) end; table.sort(ids); return ids
 	end
@@ -149,11 +165,25 @@ function Client.start()
 		if not state or currentPanel=="" then return end
 		local p=state.profile
 		panelTitle.Text=t(currentPanel)
-		if currentPanel=="map" then
+		if pending or state.busy then label(content,t("saving")) end
+		if currentPanel=="result" and reveal then
+			local slime=p.slimes[reveal.uid]
+			if slime then
+				local item=if slime.evolutionId then C.evolutions[slime.speciesId] else C.species[slime.speciesId]
+				panelTitle.Text=t("completed"); label(content,named(item))
+				local viewport=Instance.new("ViewportFrame"); viewport.Size=UDim2.new(1,-16,0,150)
+				viewport.BackgroundColor3=Color3.fromRGB(28,48,53); viewport.Ambient=Color3.fromRGB(190,205,210); viewport.Parent=content
+				local camera=Instance.new("Camera"); camera.CFrame=CFrame.lookAt(Vector3.new(4,2,-6),Vector3.new(0,.3,0))
+				camera.Parent=viewport; viewport.CurrentCamera=camera
+				renderer.preview(slime.speciesId,slime.evolutionId~=nil,viewport)
+				label(content,(if lang=="en" then C.rarityEn else C.rarityRu)[C.species[slime.speciesId].rarity].." · "..t(item.role))
+			end
+			button(content,t("continue"),function() local back=reveal.back; reveal=nil; open(back) end)
+		elseif currentPanel=="map" then
 			button(content,t("returnHome"),function() open(""); request("ReturnHome") end)
 			for _,id in C.order do
 				local item=C.islands[id]
-				label(content,named(item).." · "..(if id=="shore" then "Plastic / Metal" elseif id=="bay" then "Metal · Breaker" else "Crystal · Sweeper"))
+				label(content,named(item).." · "..t(id.."Theme"))
 				if p.unlockedIslands[id] then button(content,t("travel"),function() request("Travel",{island=id}); open("") end)
 				else
 					button(content,t("unlock")..": "..money(item.price),function() spend(named(item).." — "..money(item.price),"UnlockIsland",{island=id}) end,
@@ -171,10 +201,19 @@ function Client.start()
 			end
 		elseif currentPanel=="news" or currentPanel=="help" then
 			label(content,t(if currentPanel=="news" then "newsText" else "helpText"))
+			if currentPanel=="help" and state.diagnostics then
+				button(content,t("diagnostics"),function()
+					local metrics=Metrics.summary(frameMetrics); local server=state.diagnostics
+					label(content,"Test · "..Config.buildVersion.." · "..C.balanceVersion)
+					label(content,t("clientMetrics")..": "..string.format("%.1f FPS · p95 %.2f ms · n=%d",if metrics.median>0 then 1000/metrics.median else 0,metrics.p95,metrics.count))
+					label(content,t("serverMetrics")..": "..string.format("p95 %.2f ms · n=%d",server.p95,server.count))
+					label(content,t("metricsNote"))
+				end)
+			end
 			if p.tutorial.step<7 then button(content,t("skip"),function() spend(t("skip"),"SkipTutorial",{}) end) end
 		elseif currentPanel=="recycler" then
 			label(content,t("preview")..": "..money(state.preview.coins)..(if p.tutorial.step==4 then " +15 "..t("coins") else ""))
-			for _,material in C.materials do label(content,material..": +"..state.preview.materials[material]) end
+			for _,material in C.materials do label(content,t(material)..": +"..state.preview.materials[material]) end
 			button(content,t("process"),function() spend(t("process").." — "..money(state.preview.coins),"ProcessCargo",{}) end,state.preview.coins>0)
 		elseif currentPanel=="shop" then
 			for _,kind in {"tool","bag","storage","consumables","decor","trait"} do
@@ -192,7 +231,7 @@ function Client.start()
 			elseif tab=="consumables" then
 				local highest=if p.unlockedIslands.cave then "cave" elseif p.unlockedIslands.bay then "bay" else "shore"
 				local price=C.islands[highest].tea
-				label(content,t("tea").." · "..math.max(0,p.boosts.workTeaExpiresAt-state.serverTime).."s")
+				label(content,t("tea").." · "..Format.duration(p.boosts.workTeaExpiresAt-state.serverTime))
 				button(content,t("buy").." · "..money(price),function() spend(t("tea").." — "..money(price),"BuyTea",{}) end,p.tutorial.step>=7 and p.coins>=price)
 			elseif tab=="decor" then
 				for _,id in C.decorOrder do
@@ -210,19 +249,7 @@ function Client.start()
 		elseif currentPanel=="team" then
 			label(content,t("team")..": "..#p.team.." / "..(if p.unlockedIslands.bay then 3 elseif p.tutorial.step>=7 then 2 else 1))
 			button(content,t("autoTeam"),function()
-				local ranked=keys(p.slimes)
-				local function score(id: string): number
-					local s=p.slimes[id]; local species=C.species[s.speciesId]
-					local power=C.islands[species.island].power*C.rarityPower[species.rarity]*(1+0.12*(s.level-1))*(1+0.1*s.rank)*(if s.evolutionId then 1.2 else 1)
-					if (if s.evolutionId then C.evolutions[s.speciesId].role else species.role)=="Breaker" and state.location=="bay" then power*=1.35 end
-					return power
-				end
-				table.sort(ranked,function(a,b) local sa,sb=score(a),score(b); return if sa==sb then a<b else sa>sb end)
-				local limit=if p.unlockedIslands.bay then 3 elseif p.tutorial.step>=7 then 2 else 1
-				local team={}
-				for _,id in p.team do if p.slimes[id].locked then table.insert(team,id) end end
-				for _,id in ranked do if #team<limit and not table.find(team,id) then table.insert(team,id) end end
-				spend(t("autoTeam"),"EquipTeam",{uids=team})
+				spend(t("autoTeam"),"EquipTeam",{uids=state.suggestedTeam})
 			end)
 			button(content,t("recycle"),function() currentPanel="recycle"; renderPanel() end)
 			teamList(false)
@@ -241,7 +268,7 @@ function Client.start()
 				end
 			end
 			if combat then label(content,t("combat")); showCombat(combat.current) end
-			label(content,(if lang=="en" then C.rarityEn else C.rarityRu)[species.rarity].." · "..t(if s.evolutionId then evo.role else species.role).." · "..(s.traitId or "—"))
+			label(content,(if lang=="en" then C.rarityEn else C.rarityRu)[species.rarity].." · "..t(if s.evolutionId then evo.role else species.role).." · "..(if s.traitId then t(s.traitId) else "—"))
 			local equipped=table.find(p.team,id)
 			button(content,t(if equipped then "unequip" else "equip"),function()
 				local team=table.clone(p.team)
@@ -259,7 +286,7 @@ function Client.start()
 			end
 			if evo and not s.evolutionId then
 				if combat and combat.evolved then label(content,t("afterEvolution")); showCombat(combat.evolved) end
-				local title=t("evolve")..": "..named(evo).." · "..money(evo.coins).." + "..evo.amount.." "..evo.material
+				local title=t("evolve")..": "..named(evo).." · "..money(evo.coins).." + "..evo.amount.." "..t(evo.material)
 				button(content,title,function() spend(title,"EvolveSlime",{uid=id,recipeId=evo.id}) end,s.level>=3 and p.unlockedIslands[evo.island] and p.coins>=evo.coins and p.materials[evo.material]>=evo.amount)
 			end
 			button(content,t("trait"),function() currentPanel="trait"; renderPanel() end)
@@ -294,7 +321,7 @@ function Client.start()
 			label(content,t("traitNote"))
 			local offer=p.pendingTraitOffer
 			if offer then
-				label(content,offer.target..": "..offer.traitId)
+				label(content,(if offer.target=="tool" then t("tool") else slimeTitle(offer.target))..": "..t(offer.traitId))
 				button(content,t("keep"),function() request("ResolveTrait",{offerId=offer.id,accept=false}) end)
 				button(content,t("accept"),function() request("ResolveTrait",{offerId=offer.id,accept=true}) end)
 			else
@@ -314,14 +341,14 @@ function Client.start()
 				if current then button(content,t("clear").." "..i,function() request("PlaceDecoration",{itemId="",slot=i}) end,state.location=="home") end
 			end
 		elseif currentPanel=="collection" then
-			label(content,t("materials")..": Plastic "..p.materials.Plastic.." · Metal "..p.materials.Metal.." · Crystal "..p.materials.Crystal)
-			label(content,t("fragments")..": shore "..p.fragments.shore.." · bay "..p.fragments.bay.." · cave "..p.fragments.cave)
+			for _,material in C.materials do label(content,t(material)..": "..Format.number(p.materials[material])) end
+			for _,island in C.order do label(content,t("fragments").." · "..named(C.islands[island])..": "..Format.number(p.fragments[island])) end
 			local count=0; for _ in p.collections.slimeSpeciesIds do count+=1 end
 			label(content,t("collection")..": "..count.." / 15")
 			for _,id in C.speciesOrder do label(content,(if p.collections.slimeSpeciesIds[id] then "✓ " else "— ")..named(C.species[id])) end
 			for _,island in C.order do for family=1,3 do for rarity=1,5 do
 				local key=island.."/"..family.."/"..rarity
-				label(content,named(C.islands[island]).." · "..C.materials[family].." · "..(if lang=="en" then C.rarityEn else C.rarityRu)[rarity]..": "..(p.collections.junkCountsByKey[key] or 0))
+				label(content,named(C.islands[island]).." · "..t(C.materials[family]).." · "..(if lang=="en" then C.rarityEn else C.rarityRu)[rarity]..": "..Format.number(p.collections.junkCountsByKey[key] or 0))
 			end end end
 			for _,recipe in C.evolutions do label(content,(if p.collections.evolutions[recipe.id] then "✓ " else "— ")..named(recipe)) end
 		elseif currentPanel=="event" then
@@ -340,48 +367,65 @@ function Client.start()
 		button(menu,t("settings"),function() open("settings") end)
 		button(menu,t("news"),function() open("news") end)
 		for _,child in toolbar:GetChildren() do if child:IsA("GuiButton") then child:Destroy() end end
-		for _,name in {"map","team","collection","help","settings","event","menu"} do
+		for _,name in {"map","team","collection","help","settings","event","home","menu"} do
 			button(toolbar,t(name),function()
-				if name=="menu" then request("Pause"); open("") else open(name) end
+				if name=="home" then request("ReturnHome")
+				elseif name=="menu" then request("Pause"); open("") else open(name) end
 			end)
 		end
 	end
 	rebuildNavigation()
+	local retry=button(gui,t("retry"),function() loadFailed=false; request("Sync") end)
+	retry.Size=UDim2.fromOffset(260,48); retry.Position=UDim2.new(.5,-130,.5,0); retry.Visible=false
 	local station=button(gui,"",function()
 		if goalStation then open(goalStation); if goalStation=="nursery" then request("ViewNursery") end end
 	end)
 	station.Size=UDim2.fromOffset(245,48); station.Position=UDim2.new(0.5,-122,1,-64); station.Visible=false
 	remote.OnClientEvent:Connect(function(snapshot: any)
 		if snapshot.phase~="Ready" then
+			loadFailed=snapshot.phase=="LoadError"; retry.Visible=loadFailed
 			hud.Text=t(if snapshot.phase=="LoadError" then "loadError" else "loading")
 			if snapshot.phase=="LoadError" then notify(t("loadError").." "..tostring(snapshot.errorCode)) end
 			return
 		end
 		if snapshot.viewRevision<=lastView then return end
+		loadFailed=false; retry.Visible=false
 		lastView=snapshot.viewRevision
 		local oldLang=lang
+		local oldBusy=state and state.busy
 		state=snapshot; state.receivedAt=os.clock(); lang=state.profile.settings.language
 		audio.settings(state.profile.settings)
 		local cargo=0; for _,g in state.profile.cargo do cargo+=g.count end
 		if cargo>lastCargo then audio.play("collect") end
 		lastCargo=cargo
+		local discovered=0
+		if knownJunk then
+			for key in state.profile.collections.junkCountsByKey do if not knownJunk[key] then discovered+=1 end end
+		end
+		knownJunk=table.clone(state.profile.collections.junkCountsByKey)
+		if discovered>0 then notify(t("newCollection")..": "..discovered) end
 		renderer.update(snapshot)
 		menu.Visible=not state.playing and currentPanel==""; toolbar.Visible=state.playing and currentPanel==""
 		if oldLang~=lang then rebuildNavigation() end
 		if snapshot.requestId and pending and pending.request.requestId==snapshot.requestId and snapshot.errorCode~="Saving" then
+			local operation=pending.request
 			pending=nil
 			if snapshot.errorCode then notify(t(snapshot.errorCode)) else
 				local result=snapshot.result
 				notify(t("completed")..(if result and result.speciesId then " · "..named(C.species[result.speciesId]) else ""))
 				audio.play("confirm")
+				local shownUid=if result and result.uid then result.uid elseif operation.action=="EvolveSlime" then operation.payload.uid else nil
+				if shownUid and state.profile.slimes[shownUid] then
+					reveal={uid=shownUid,back=currentPanel}; panelRevision=-1; open("result")
+				end
 			end
 		elseif snapshot.errorCode then notify(t(snapshot.errorCode)) end
 		if state.busy then notify(t("saving")) end
 		if state.profile.pendingTraitOffer and currentPanel=="" then open("trait") end
-		if currentPanel~="" and (panelRevision~=state.profile.revision or oldLang~=lang or currentPanel=="event") then renderPanel() end
+		if currentPanel~="" and (panelRevision~=state.profile.revision or oldLang~=lang or oldBusy~=state.busy or snapshot.requestId~=nil or currentPanel=="event") then renderPanel() end
 	end)
 	local function targetAt(pos: Vector2)
-		if not state or not state.playing or currentPanel~="" or state.busy then return end
+		if not state or not state.playing or currentPanel~="" or state.busy or systemMenuOpen then return end
 		local camera=workspace.CurrentCamera; if not camera then return end
 		local ray=camera:ScreenPointToRay(pos.X,pos.Y)
 		local params=RaycastParams.new(); params.FilterType=Enum.RaycastFilterType.Include; params.FilterDescendantsInstances={renderer.folder}
@@ -398,10 +442,14 @@ function Client.start()
 		elseif input.KeyCode==Enum.KeyCode.Escape and currentPanel~="" then open("") end
 	end)
 	Input.TouchTapInWorld:Connect(function(pos,processed) if not processed then targetAt(pos) end end)
+	GuiService.MenuOpened:Connect(function() systemMenuOpen=true; request("Modal",{open=true}) end)
+	GuiService.MenuClosed:Connect(function() systemMenuOpen=false; request("Modal",{open=currentPanel~=""}) end)
 	task.spawn(function()
 		while true do
 			task.wait(0.3)
-			if not state then request("Sync"); continue end
+			if not state then if not loadFailed then request("Sync") end; continue end
+			local modal=currentPanel~="" or systemMenuOpen
+			if not state.busy and state.modal~=modal then request("Modal",{open=modal}) end
 			local p=state.profile
 			local amount=0; for _,g in p.cargo do amount+=g.count end
 			local capacity=C.bag.values[p.equipment.bagTier]

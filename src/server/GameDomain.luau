@@ -120,6 +120,27 @@ function Game.combatPreview(p: Profile, uid: string, now: number, c: any): any
 	return result
 end
 
+function Game.suggestTeam(p: Profile, island: string, now: number, c: any): {string}
+	local origin=c.islands[island] or c.islands.shore
+	local ranked: {string}={}
+	local scores: {[string]: number}={}
+	for uid in p.slimes do
+		local score=0
+		for i,material in c.materials do
+			local hit,interval=Game.damage(p,uid,material,now,c)
+			score+=hit/interval*origin.materials[i]
+		end
+		scores[uid]=score; table.insert(ranked,uid)
+	end
+	table.sort(ranked,function(a,b) return if scores[a]==scores[b] then a<b else scores[a]>scores[b] end)
+	local result={}
+	for _,uid in p.team do if p.slimes[uid].locked then table.insert(result,uid) end end
+	for _,uid in ranked do
+		if #result<Game.slots(p) and not table.find(result,uid) then table.insert(result,uid) end
+	end
+	return result
+end
+
 function Game.apply(p: Profile, action: string, v: any, context: any, c: any): (boolean,any)
 	local now=context.now
 	if action=="SkipTutorial" then

@@ -37,12 +37,25 @@ function Schema.validate(p: any, c: any): (boolean, string?)
 		return true
 	end
 	if not shape(p,sample) then return false,"ProfileShape" end
+	local function array(value: any,limit: number): boolean
+		local count=0
+		for key in value do
+			if not integer(key,limit) or key<1 or key>#value then return false end
+			count+=1
+		end
+		return count==#value and count<=limit
+	end
+	if not array(p.team,3) or not array(p.recentDurableOperations,128) then return false,"ProfileShape" end
+	if not integer(p.createdAt,1e12) or not integer(p.updatedAt,1e12)
+		or #p.balanceVersion>64 then return false,"Metadata" end
+	if p.equipment.toolTrait and not table.find(c.traits,p.equipment.toolTrait) then return false,"Trait" end
 	if not integer(p.coins,c.coinLimit) or not integer(p.revision,1e15) then return false,"Wallet" end
 	for _, material in c.materials do if not integer(p.materials[material],c.itemLimit) then return false,"Material" end end
 	for _, id in c.order do
 		if not integer(p.fragments[id],c.itemLimit) or not integer(p.fragmentProgress[id],14) then return false,"Fragments" end
-		for _, key in {"sinceRare","sinceEpic","sinceLegendary"} do
-			if not integer(p.incubators[id][key],1000000000) then return false,"Pity" end
+		local limits: {[string]: number}={sinceRare=9,sinceEpic=49,sinceLegendary=199}
+		for key,limit in limits do
+			if not integer(p.incubators[id][key],limit) then return false,"Pity" end
 		end
 	end
 	for _, key in {"tool","bag","storage"} do
@@ -52,7 +65,7 @@ function Schema.validate(p: any, c: any): (boolean, string?)
 	local count=0
 	for uid, slime in p.slimes do
 		count+=1
-		if type(uid)~="string" or #uid>64 or type(slime)~="table" or not c.species[slime.speciesId]
+		if type(uid)~="string" or #uid==0 or #uid>64 or type(slime)~="table" or not c.species[slime.speciesId]
 			or not integer(slime.level,10) or slime.level<1 or not integer(slime.rank,3)
 			or type(slime.locked)~="boolean" then return false,"Slime" end
 		if slime.evolutionId then
@@ -61,7 +74,9 @@ function Schema.validate(p: any, c: any): (boolean, string?)
 		end
 		if slime.traitId and not table.find(c.traits,slime.traitId) then return false,"Trait" end
 	end
-	if count>100 then return false,"Storage" end
+	if count>c.storage.values[p.equipment.storageTier] then return false,"Storage" end
+	if p.starterUid and (type(p.starterUid)~="string" or not p.slimes[p.starterUid]
+		or p.slimes[p.starterUid].speciesId~="shore_sprout") then return false,"Starter" end
 	local seen={}
 	local slots=if p.unlockedIslands.bay then 3 elseif p.tutorial.step>=7 then 2 else 1
 	if #p.team>slots then return false,"Team" end
@@ -77,6 +92,8 @@ function Schema.validate(p: any, c: any): (boolean, string?)
 			or not integer(g.coinValueEach,100000) or not integer(g.materialAmountEach,100)
 			or type(g.balanceVersion)~="string" then return false,"Cargo" end
 		cargoCount+=g.count
+		local island,material,rarity=string.match(key,"^([%w_]+)/([%w_]+)/([1-5])$")
+		if island~=g.island or material~=g.material or not rarity then return false,"Cargo" end
 	end
 	if groups>45 or cargoCount>c.bag.values[p.equipment.bagTier] then return false,"CargoSize" end
 	if #p.recentDurableOperations>128 then return false,"Operations" end
@@ -84,9 +101,22 @@ function Schema.validate(p: any, c: any): (boolean, string?)
 		if type(op)~="table" or type(op.id)~="string" or #op.id>130 then return false,"Operation" end
 	end
 	if not p.unlockedIslands.shore or (p.unlockedIslands.cave and not p.unlockedIslands.bay) then return false,"Islands" end
-	for id in p.unlockedIslands do if not c.islands[id] then return false,"Island" end end
+	for id,value in p.unlockedIslands do if not c.islands[id] or value~=true then return false,"Island" end end
 	if not integer(p.tutorial.step,7) or p.tutorial.step<1 then return false,"Tutorial" end
 	if not table.find({"Active","Completed","Skipped"},p.tutorial.state) then return false,"Tutorial" end
+	if not integer(p.tutorial.counters.collected,3) or p.tutorial.version~=1 then return false,"Tutorial" end
+	for key,value in p.tutorial.grantedRewardIds do
+		if (key~="starter" and key~="bonus") or value~=true then return false,"Tutorial" end
+	end
+	for id,value in p.base.ownedDecor do if not c.decor[id] or value~=true then return false,"Decoration" end end
+	for id,value in p.collections.slimeSpeciesIds do if not c.species[id] or value~=true then return false,"Collection" end end
+	local evolutionIds={}; for _,recipe in c.evolutions do evolutionIds[recipe.id]=true end
+	for id,value in p.collections.evolutions do if not evolutionIds[id] or value~=true then return false,"Collection" end end
+	for key,value in p.collections.junkCountsByKey do
+		if type(key)~="string" then return false,"Collection" end
+		local island,family,rarity=string.match(key,"^([%w_]+)/([1-3])/([1-5])$")
+		if not island or not c.islands[island] or not family or not rarity or not integer(value,1e12) then return false,"Collection" end
+	end
 	if not integer(p.base.restorationTier,4) or p.base.restorationTier<1 then return false,"Base" end
 	for slot, id in p.base.decorationSlots do
 		local slotNumber=tonumber(slot)

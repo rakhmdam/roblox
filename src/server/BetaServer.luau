@@ -6,6 +6,7 @@ local shared=ReplicatedStorage:WaitForChild("Shared")
 local C=require(shared:WaitForChild("Catalog"))
 local Config=require(shared:WaitForChild("BuildConfig"))
 local Protocol=require(shared:WaitForChild("Protocol"))
+local Metrics=require(shared:WaitForChild("Metrics"))
 local Schema=require(script.Parent:WaitForChild("ProfileSchema"))
 local Game=require(script.Parent:WaitForChild("GameDomain"))
 local Store=require(script.Parent:WaitForChild("ProfileStore"))
@@ -16,9 +17,12 @@ local Server={}
 function Server.start()
 	assert(Config.persistenceEnabled and not Config.monetizationEnabled,"Only persistent free beta is implemented")
 	local store=Store.new(Config,C)
+	local diagnostics=Config.environment=="Test" and Config.diagnosticsEnabled
+	local stepMetrics=Metrics.new(6000)
+	local stepSummary=Metrics.summary(stepMetrics)
 	local remote=Instance.new("RemoteEvent"); remote.Name="BetaSession"; remote.Parent=ReplicatedStorage
 	local sessions: {[Player]: any}={}
-	local loading: {[Player]: boolean}={}
+	local loading: {[Player]: string}={}
 	local rejected: {[Player]: number}={}
 	local function rejectLog(player: Player,code: string)
 		local now=os.clock()
@@ -60,9 +64,11 @@ function Server.start()
 		end
 		remote:FireClient(player,{phase="Ready",requestId=requestId,success=errorCode==nil,errorCode=errorCode,
 			result=result,sessionNonce=s.nonce,viewRevision=s.viewRevision,profileRevision=s.profile.revision,
+			diagnostics=if diagnostics then stepSummary else nil,
 			profile=s.profile,location=s.location,slot=s.slot,playing=s.playing,busy=s.busy,
 			nodes=if C.islands[s.location] then s.nodes else {},selected=s.selected,
-			chances=chances,combat=combat,bases=publicBases,companions=companions,preview=Game.preview(s.profile),serverTime=os.time(),
+			chances=chances,combat=combat,suggestedTeam=Game.suggestTeam(s.profile,s.location,os.time(),C),
+			bases=publicBases,companions=companions,preview=Game.preview(s.profile),serverTime=os.time(),modal=s.modal==true,
 			event={id=event.id,active=event.active,nextAt=event.nextAt,endsAt=event.endsAt,hp=event.hp,maxHp=event.maxHp,
 				cycles=event.cycles[player.UserId] or 0},returning=s.returnAt~=nil})
 	end
@@ -104,7 +110,11 @@ function Server.start()
 		local candidate=Schema.clone(before)
 		local ok,result=Game.apply(candidate,action,payload,{now=os.time(),uid=uid(),random=integer,
 			randomEnabled=Config.randomOperationsEnabled},C)
-		if not ok then s.busy=false; send(player,s,result,id); return end
+		if not ok then
+			s.busy=false; send(player,s,result,id)
+			if result=="StorageFull" then Analytics.custom(player,"StorageFull",Config.analyticsEnabled,s.location) end
+			return
+		end
 		candidate.revision+=1; candidate.updatedAt=os.time()
 		table.insert(candidate.recentDurableOperations,{id=fullId,result=result})
 		if #candidate.recentDurableOperations>128 then table.remove(candidate.recentDurableOperations,1) end
@@ -118,7 +128,15 @@ function Server.start()
 				if saved then
 					s.profile=pending.data; s.pending=nil; s.busy=false
 					Base.paint(player,s,C)
-					Analytics.economy(player,action,s.profile.coins-before.coins,s.profile.coins,Config.analyticsEnabled)
+					local item=payload.speciesId or payload.recipeId or payload.itemId or payload.kind or action
+					Analytics.economy(player,action,s.profile.coins-before.coins,s.profile.coins,Config.analyticsEnabled,
+						{sku=action..":"..item,island=payload.island or s.location})
+					if action=="Incubate" then
+						local pity=before.incubators[payload.island]
+						if pity.sinceRare>=9 or pity.sinceEpic>=49 or pity.sinceLegendary>=199 then
+							Analytics.custom(player,"IncubatorGuarantee",Config.analyticsEnabled,payload.island)
+						end
+					end
 					if action=="ProcessCargo" and before.tutorial.step==4 then Analytics.funnel(player,6,"FirstProcess",Config.analyticsEnabled) end
 					if action=="BuyUpgrade" and before.tutorial.step==5 and s.profile.tutorial.step==6 then Analytics.funnel(player,7,"FirstUpgrade",Config.analyticsEnabled) end
 					if action=="ViewNursery" and before.tutorial.step==6 then Analytics.funnel(player,8,"TutorialCompleted",Config.analyticsEnabled) end
@@ -138,9 +156,9 @@ function Server.start()
 	end
 	local function join(player: Player)
 		if loading[player] or sessions[player] then return end
-		loading[player]=true
+		local generation=uid(); loading[player]=generation
 		task.delay(45,function()
-			if loading[player] and player.Parent then player:Kick("Profile loading timed out. Please reconnect; existing data is unchanged.") end
+			if loading[player]==generation and player.Parent then player:Kick("Profile loading timed out. Please reconnect; existing data is unchanged.") end
 		end)
 		remote:FireClient(player,{phase="LoadingProfile"})
 		local handle,err=store:load(player.UserId)
@@ -148,7 +166,6 @@ function Server.start()
 		if not handle then
 			if player.Parent then
 				remote:FireClient(player,{phase="LoadError",errorCode=err})
-				task.delay(5,function() if player.Parent then player:Kick("Профиль не загружен / Profile unavailable. "..tostring(err)) end end)
 			end
 			return
 		end
@@ -188,6 +205,14 @@ function Server.start()
 		if not bucket(s,"all",12,20) then rejectLog(player,"RateLimit"); return end
 		if r.action=="Sync" then s.ready=true; send(player,s); return end
 		if r.sessionNonce~=s.nonce then rejectLog(player,"SessionExpired"); send(player,s,"SessionExpired",r.requestId); return end
+		-- A committed retry is a receipt lookup, even after moving away or dying.
+		-- Station/alive checks apply only to a new operation, not its saved answer.
+		if not transient[r.action] then
+			local fullId=s.nonce..":"..r.requestId
+			for _,op in s.profile.recentDurableOperations do
+				if op.id==fullId then send(player,s,nil,r.requestId,op.result); return end
+			end
+		end
 		local category=if r.action=="SelectTarget" then "target" elseif transient[r.action] then "ui" else "economy"
 		if not bucket(s,category,if category=="target" then 5 elseif category=="ui" then 4 else 2,
 			if category=="target" then 10 else 4) then send(player,s,"RateLimit",r.requestId); return end
@@ -248,6 +273,7 @@ function Server.start()
 	local function leave(player: Player)
 		local s=sessions[player]; if not s or s.leaving then return end
 		s.leaving=true
+		event.cycles[player.UserId]=nil; event.rewards[player.UserId]=nil
 		local deadline=os.clock()+20
 		while s.busy and not s.blocked and os.clock()<deadline do task.wait(0.1) end
 		if not s.busy then
@@ -281,6 +307,7 @@ function Server.start()
 		local lastHeartbeat=0
 		while true do
 			task.wait(0.1); local now,wall=os.clock(),os.time()
+			local stepStart=os.clock()
 			local broadcast=now-lastBroadcast>=0.3
 			local heartbeat=now-lastHeartbeat>=2
 			if heartbeat then lastHeartbeat=now end
@@ -358,6 +385,10 @@ function Server.start()
 					if changed then s.dirty=true end
 					if broadcast and (s.dirty or event.active or s.returnAt or heartbeat) then send(p,s); s.dirty=false end
 				end
+			end
+			if diagnostics then
+				Metrics.add(stepMetrics,(os.clock()-stepStart)*1000)
+				if heartbeat then stepSummary=Metrics.summary(stepMetrics) end
 			end
 		end
 	end)

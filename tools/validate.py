@@ -27,6 +27,8 @@ def main():
                         'src/server/ProfileSchema.luau', 'src/server/Lease.luau',
                         'src/server/ResourceService.luau',
                         'src/shared/Catalog.luau', 'src/shared/Protocol.luau',
+                        'src/shared/Format.luau',
+                        'src/shared/Metrics.luau',
                         'tests/beta.spec.luau'], cwd=stage, check=True)
         files = [p.relative_to(stage).as_posix() for p in (stage / 'src').rglob('*.luau')]
         subprocess.run([binary('luau-compile'), '--null', *files], cwd=stage, check=True)

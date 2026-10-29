@@ -5,6 +5,8 @@ local Lease=require("../src/server/Lease")
 local Protocol=require("../src/shared/Protocol")
 local C: any=require("../src/shared/Catalog")
 local Resources=require("../src/server/ResourceService")
+local Format=require("../src/shared/Format")
+local Metrics=require("../src/shared/Metrics")
 local total=0
 local function test(name: string,run: ()->()) run(); total+=1; print("PASS "..name) end
 local serial=0
@@ -309,5 +311,46 @@ test("evolution preview uses real damage without mutating owned slime",function(
 	assert(preview.evolved.Plastic.hit<preview.evolved.Metal.hit)
 	assert(not p.slimes.a.evolutionId and p.slimes.a.level==before.slimes.a.level and p.slimes.a.locked)
 	assert(Game.combatPreview(p,"missing",10000,C)==nil)
+end)
+test("suggested team respects material, real traits, favorites and stable UID ties",function()
+	local p=profile(); p.tutorial.step=7
+	p.slimes.a={speciesId="shore_sprout",level=1,rank=0,locked=false}
+	p.slimes.b={speciesId="shore_sprout",level=1,rank=0,locked=false,traitId="metalwork"}
+	p.slimes.c={speciesId="shore_sprout",level=1,rank=0,locked=true}
+	p.slimes.d={speciesId="shore_sprout",level=1,rank=0,locked=false}; p.team={"c"}
+	local team=Game.suggestTeam(p,"bay",10000,C)
+	assert(#team==2 and team[1]=="c" and team[2]=="b")
+	p.slimes.b.traitId=nil; team=Game.suggestTeam(p,"shore",10000,C)
+	assert(team[1]=="c" and team[2]=="a")
+end)
+test("malformed profile maps and sparse arrays are rejected before load",function()
+	local changes={
+		function(p: any) p.equipment.toolTrait="admin" end,
+		function(p: any) p.team={[2]="missing"} end,
+		function(p: any) p.collections.slimeSpeciesIds.unknown=true end,
+		function(p: any) p.collections.junkCountsByKey["shore/9/1"]=1 end,
+		function(p: any) p.collections.junkCountsByKey["shore/1/1"]=-1 end,
+		function(p: any) p.base.ownedDecor.admin=true end,
+		function(p: any) p.starterUid="deleted" end,
+		function(p: any) p.unlockedIslands.bay="yes" end,
+		function(p: any) p.incubators.shore.sinceLegendary=200 end,
+		function(p: any) p.tutorial.counters.collected=0/0 end,
+	}
+	for _,change in changes do local p=profile(); change(p); assert(not Schema.validate(p,C)) end
+end)
+test("exact readable prices and bounded countdown formatting",function()
+	assert(Format.number(0)=="0" and Format.number(1500)=="1 500")
+	assert(Format.number(1000000000)=="1 000 000 000")
+	assert(Format.duration(-10)=="0:00" and Format.duration(65)=="1:05")
+end)
+test("performance recorder has bounded memory and defined percentiles",function()
+	local recorder=Metrics.new(100)
+	assert(Metrics.summary(recorder).count==0)
+	for i=1,100 do Metrics.add(recorder,i) end
+	local summary=Metrics.summary(recorder)
+	assert(summary.median==50 and summary.p95==95 and summary.max==100)
+	Metrics.add(recorder,0/0); Metrics.add(recorder,math.huge); assert(Metrics.summary(recorder).count==100)
+	for _=1,100 do Metrics.add(recorder,16) end
+	summary=Metrics.summary(recorder); assert(summary.count==100 and summary.p95==16)
 end)
 print(tostring(total).." beta domain tests passed")

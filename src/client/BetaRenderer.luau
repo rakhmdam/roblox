@@ -130,12 +130,20 @@ function Renderer.start(): any
 			if not snapshot.profile.settings.reducedMotion then destination+=Vector3.new(0,math.abs(math.sin(os.clock()*5+item.index))*0.45,0) end
 			local facing=if item.target then Vector3.new(item.target[1],destination.Y,item.target[3]) else Vector3.new(root.Position.X,destination.Y,root.Position.Z)
 			local pose=if (facing-destination).Magnitude>.1 then CFrame.lookAt(destination,facing) else CFrame.new(destination)
+			if not snapshot.profile.settings.reducedMotion then
+				if os.clock()-item.createdAt<1.2 then
+					pose+=Vector3.new(0,math.abs(math.sin((os.clock()-item.createdAt)*math.pi*2))*0.7,0)
+				elseif item.target then pose*=CFrame.Angles(0,0,math.sin(os.clock()*7)*.08) end
+			end
 			if (item.model:GetPivot().Position-destination).Magnitude>70 then item.model:PivotTo(pose)
 			else item.model:PivotTo(item.model:GetPivot():Lerp(pose,1-math.exp(-dt*8))) end
 		end
 	end)
 	return {
 		folder=folder,
+		preview=function(speciesId: string,evolved: boolean,parent: Instance): Model
+			local model=makeSlime(speciesId,evolved); model.Parent=parent; return model
+		end,
 		update=function(state: any)
 			snapshot=state
 			local seen={}
@@ -218,7 +226,7 @@ function Renderer.start(): any
 					local signature=s.speciesId..tostring(s.evolutionId)
 					if not slimes[key] or slimes[key].signature~=signature then
 						if slimes[key] then slimes[key].model:Destroy() end
-						slimes[key]={model=makeSlime(s.speciesId,s.evolutionId~=nil),signature=signature,userId=companion.userId,index=index}
+						slimes[key]={model=makeSlime(s.speciesId,s.evolutionId~=nil),signature=signature,userId=companion.userId,index=index,createdAt=os.clock()}
 					end
 					slimes[key].index=index; slimes[key].target=companion.target
 				end
