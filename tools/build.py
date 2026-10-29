@@ -50,6 +50,10 @@ def build():
         _, props = item(scene, part.get('class', 'Part'), part['name'])
         prop(props, 'bool', 'Anchored', 'true')
         prop(props, 'bool', 'CanCollide', str(part.get('collide', True)).lower())
+        prop(props, 'bool', 'CanTouch', 'false')
+        prop(props, 'bool', 'CanQuery', str(part.get('query', True)).lower())
+        if part.get('shape'):
+            prop(props, 'token', 'shape', {'Ball': 0, 'Block': 1, 'Cylinder': 2}[part['shape']])
         vector(props, 'size', part['size'])
         cf = ET.SubElement(props, 'CoordinateFrame', name='CFrame')
         for key, value in zip(('X', 'Y', 'Z'), part['position']):

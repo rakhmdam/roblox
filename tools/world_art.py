@@ -2,9 +2,9 @@
 def parts():
     result = []
 
-    def part(group, name, size, position, color, collide=True):
+    def part(group, name, size, position, color, collide=True, shape=None, query=True):
         result.append(dict(group=group, name=name, size=size, position=position,
-                           color=color, collide=collide))
+                           color=color, collide=collide, shape=shape, query=query))
 
     def island(group, x, z, theme, base=False):
         land, accent = theme
@@ -20,7 +20,7 @@ def parts():
             part(group, name+'Sign', [5, 2, .4], [x+dx, 6, z+dz+4], color, False)
         for index, (dx, dz) in enumerate([(-36, -29), (36, -29), (-36, 28), (36, 28)]):
             part(group, f'Trunk{index}', [2.5, 8, 2.5], [x+dx, 5, z+dz], [130, 92, 63])
-            part(group, f'Crown{index}', [10, 8, 10], [x+dx, 12, z+dz], accent, False)
+            part(group, f'Crown{index}', [10, 8, 10], [x+dx, 12, z+dz], accent, False, 'Ball')
         for index in range(6):
             part(group, f'Rock{index}', [3+index%3, 2+index%2, 3],
                  [x-42+index*16, 1, z-42], [149, 159, 148], False)
@@ -33,6 +33,17 @@ def parts():
     part('Ocean', 'Water', [1300, 1, 1000], [350, -6, -100], [56, 148, 172], False)
     for index, name in enumerate(['shore', 'bay', 'cave']):
         island(name, index*400, 0, themes[index])
+        for ornament in range(5):
+            x=index*400-37+ornament*18
+            if name=='shore':
+                part(name, f'FlowerBed{ornament}', [3, .4, 3], [x, 1.9, 31], [94, 151, 94], False, query=False)
+                part(name, f'Flower{ornament}', [1, 1, 1], [x, 2.5, 31], [235, 196, 137], False, 'Ball', False)
+            elif name=='bay':
+                part(name, f'SalvagedMetal{ornament}', [4, 2+ornament%3, 4], [x, 2+ornament%3/2, 31], [137, 156, 164], False, query=False)
+                part(name, f'MetalStripe{ornament}', [4.2, .4, 4.2], [x, 3+ornament%3, 31], [208, 173, 104], False, query=False)
+            else:
+                part(name, f'CrystalGarden{ornament}', [2.5, 4+ornament%3, 2.5], [x, 3+ornament%3/2, 31], [181, 153, 224], False, query=False)
+                part(name, f'CrystalBud{ornament}', [1.4, 2, 1.4], [x+2, 2.5, 31], [213, 192, 237], False, 'Ball', False)
     for slot in range(1, 9):
         x=((slot-1)%4-1.5)*150
         z=-240-((slot-1)//4)*150
