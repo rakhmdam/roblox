@@ -9,5 +9,5 @@ return table.freeze({
 	randomOperationsEnabled = true,
 	analyticsEnabled = true,
 	-- Bind only IDs of the project's uploaded audio. Empty IDs intentionally stay silent.
-	audio = {music="",collect="",confirm=""},
+	audio = {music="rbxassetid://77885621577161",collect="rbxassetid://117150528054674",confirm="rbxassetid://104458299374083"},
 })
