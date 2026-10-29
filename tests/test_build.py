@@ -19,12 +19,16 @@ class PlaceBuildTests(unittest.TestCase):
         refs = [obj.get('referent') for obj in objects]
         self.assertEqual(len(refs), len(set(refs)))
         names = [obj.findtext('Properties/string[@name="Name"]') for obj in objects]
-        self.assertIn('ShoreArt', names)
+        self.assertIn('shore', names)
         self.assertIn('WelcomeSpawn', names)
-        self.assertIn('RecyclerSample', names)
-        for name, expected_class in [('Domain', 'ModuleScript'),
-                                     ('SceneRenderer', 'ModuleScript'),
-                                     ('Balance', 'ModuleScript')]:
+        self.assertIn('Recycler', names)
+        for slot in range(1, 9):
+            self.assertIn(f'Base{slot}', names)
+        self.assertIn('bay', names)
+        self.assertIn('cave', names)
+        for name, expected_class in [('GameDomain', 'ModuleScript'),
+                                     ('BetaRenderer', 'ModuleScript'),
+                                     ('Catalog', 'ModuleScript')]:
             obj = next(obj for obj in objects
                        if obj.findtext('Properties/string[@name="Name"]') == name)
             self.assertEqual(obj.get('class'), expected_class)
@@ -39,7 +43,7 @@ class PlaceBuildTests(unittest.TestCase):
             self.assertIn(path.read_text(encoding='utf-8'), sources)
         config = (ROOT / 'src/shared/BuildConfig.luau').read_text(encoding='utf-8')
         self.assertIn('environment = "Test"', config)
-        self.assertIn('persistenceEnabled = false', config)
+        self.assertIn('persistenceEnabled = true', config)
         self.assertIn('monetizationEnabled = false', config)
 
 

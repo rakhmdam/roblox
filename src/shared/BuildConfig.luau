@@ -1,9 +1,13 @@
 --!strict
 -- This build deliberately has no DataStore or purchase integration.
 return table.freeze({
-	buildVersion = "shore-slice-0.0.2",
+	buildVersion = "beta-implementation-0.1.0-dev",
 	environment = "Test",
 	balanceVersion = "balance-0.1.0",
-	persistenceEnabled = false,
+	persistenceEnabled = true,
 	monetizationEnabled = false,
+	randomOperationsEnabled = true,
+	analyticsEnabled = true,
+	-- Bind only IDs of the project's uploaded audio. Empty IDs intentionally stay silent.
+	audio = {music="",collect="",confirm=""},
 })

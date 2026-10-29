@@ -22,9 +22,12 @@ def main():
         stage = Path(staging)
         shutil.copytree(ROOT / 'src', stage / 'src')
         shutil.copytree(ROOT / 'tests', stage / 'tests')
-        subprocess.run([binary('luau'), 'tests/domain.spec.luau'], cwd=stage, check=True)
-        subprocess.run([binary('luau-analyze'), 'src/server/Domain.luau',
-                        'src/shared/Balance.luau', 'tests/domain.spec.luau'], cwd=stage, check=True)
+        subprocess.run([binary('luau'), 'tests/beta.spec.luau'], cwd=stage, check=True)
+        subprocess.run([binary('luau-analyze'), 'src/server/GameDomain.luau',
+                        'src/server/ProfileSchema.luau', 'src/server/Lease.luau',
+                        'src/server/ResourceService.luau',
+                        'src/shared/Catalog.luau', 'src/shared/Protocol.luau',
+                        'tests/beta.spec.luau'], cwd=stage, check=True)
         files = [p.relative_to(stage).as_posix() for p in (stage / 'src').rglob('*.luau')]
         subprocess.run([binary('luau-compile'), '--null', *files], cwd=stage, check=True)
 

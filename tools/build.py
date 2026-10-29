@@ -6,6 +6,7 @@ The output is disposable; never use it as the only copy of Studio art edits.
 from pathlib import Path
 import json
 import xml.etree.ElementTree as ET
+import importlib.util
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / 'places' / 'SlimeSalvage-Test.rbxlx'
@@ -36,9 +37,16 @@ def build():
     workspace, props = item(root, 'Workspace', 'Workspace')
     prop(props, 'bool', 'StreamingEnabled', 'true')
     prop(props, 'float', 'FallenPartsDestroyHeight', -80)
-    scene, _ = item(workspace, 'Model', 'ShoreArt')
-    art = json.loads((ROOT / 'assets' / 'shore.json').read_text(encoding='utf-8'))
+    scene_spec = importlib.util.spec_from_file_location('world_art', ROOT / 'tools/world_art.py')
+    world_art = importlib.util.module_from_spec(scene_spec)
+    scene_spec.loader.exec_module(world_art)
+    art = world_art.parts()
+    groups = {}
     for part in art:
+        group = part.get('group', 'shore')
+        if group not in groups:
+            groups[group], _ = item(workspace, 'Model', group)
+        scene = groups[group]
         _, props = item(scene, part.get('class', 'Part'), part['name'])
         prop(props, 'bool', 'Anchored', 'true')
         prop(props, 'bool', 'CanCollide', str(part.get('collide', True)).lower())
