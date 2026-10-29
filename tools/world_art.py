@@ -52,7 +52,7 @@ def detail_island(result, group, x, z, theme, base=False):
         else:
             for k in [-1,1]:
                 p('IncubatorPedestal',[1.7,.5,1.7],[dx+k*1.4,3.5,dz+2.5],gold)
-                p('IncubatorEgg',[1.2,1.6,1.2],[dx+k*1.4,4.5,dz+2.5],[179,224,187] if k<0 else [236,202,245],'Ball')
+                p('IncubatorEgg',[1.2,1.6,1.2],[dx+k*1.4,4.5,dz+3.3],[179,224,187] if k<0 else [236,202,245],'Ball')
     if theme=='shore':
         for dx,dz in [(-36,-29),(36,-29),(-36,28),(36,28)]:
             for ox,oy,oz,s in [(-2,10,0,7),(2,11,1,7),(0,14,-1,6)]:
@@ -135,7 +135,12 @@ def parts():
             part(group, f'Rock{index}', [3+index%3, 2+index%2, 3],
                  [x-42+index*16, 1, z-42], [149, 159, 148], False)
         if not base:
-            part(group, 'IslandGate', [10, 10, 2], [x, 6, z+38], accent, False)
+            part(group, 'IslandGate', [14, 1.5, 1.3], [x, 8, z+38], accent, False, query=False)
+            result[-1]['label'] = {'shore':'Зелёный берег / Green Shore',
+                                  'bay':'Железная бухта / Iron Bay',
+                                  'cave':'Кристальные пещеры / Crystal Caves'}[group]
+            for side in [-1,1]:
+                part(group, 'GatePost', [1, 7, 1], [x+side*6.5, 4.5, z+38], [130,92,63], False, query=False)
         if group == 'cave':
             for i in range(7):
                 part(group, f'CavernWall{i}', [13, 12+i%3*3, 7], [x-39+i*13, 6, z-43], [96, 91, 119])

@@ -42,6 +42,11 @@ def build():
     lighting, light_props = item(root, 'Lighting', 'Lighting')
     prop(light_props, 'float', 'ClockTime', 15.2)
     prop(light_props, 'float', 'Brightness', 2)
+    # Explicit modern mode avoids the Compatibility migration changing brightness.
+    prop(light_props, 'token', 'Technology', 4)
+    prop(light_props, 'token', 'LightingStyle', 0)
+    prop(light_props, 'bool', 'PrioritizeLightingQuality', 'false')
+    prop(light_props, 'float', 'ShadowSoftness', .35)
     prop(light_props, 'bool', 'GlobalShadows', 'true')
     color(light_props, 'Ambient', [.33, .36, .43])
     color(light_props, 'OutdoorAmbient', [.55, .59, .63])
@@ -60,6 +65,17 @@ def build():
     workspace, props = item(root, 'Workspace', 'Workspace')
     prop(props, 'bool', 'StreamingEnabled', 'true')
     prop(props, 'float', 'FallenPartsDestroyHeight', -80)
+    workspace_props = props
+    camera, camera_props = item(workspace, 'Camera', 'Camera')
+    prop(workspace_props, 'Ref', 'CurrentCamera', camera.get('referent'))
+    prop(camera_props, 'token', 'CameraType', 5)
+    prop(camera_props, 'float', 'FieldOfView', 60)
+    cf = ET.SubElement(camera_props, 'CoordinateFrame', name='CFrame')
+    for key, value in zip(('X', 'Y', 'Z'), [0, 65, 100]):
+        ET.SubElement(cf, key).text = str(value)
+    for row, values in enumerate([[1, 0, 0], [0, .8384436163, .5449883506], [0, -.5449883506, .8384436163]]):
+        for col, value in enumerate(values):
+            ET.SubElement(cf, f'R{row}{col}').text = str(value)
     scene_spec = importlib.util.spec_from_file_location('world_art', ROOT / 'tools/world_art.py')
     world_art = importlib.util.module_from_spec(scene_spec)
     scene_spec.loader.exec_module(world_art)

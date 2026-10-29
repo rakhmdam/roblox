@@ -32,6 +32,12 @@ class PlaceBuildTests(unittest.TestCase):
         first = path.read_bytes()
         self.assertEqual(first, builder.build().read_bytes())
         root = ET.fromstring(first)
+        lighting = root.find('Item[@class="Lighting"]/Properties')
+        self.assertEqual(lighting.findtext('token[@name="LightingStyle"]'), '0')
+        self.assertEqual(lighting.findtext('token[@name="Technology"]'), '4')
+        self.assertEqual(lighting.findtext('float[@name="Brightness"]'), '2')
+        camera_ref = root.findtext('Item[@class="Workspace"]/Properties/Ref[@name="CurrentCamera"]')
+        self.assertIsNotNone(root.find(f'.//Item[@class="Camera"][@referent="{camera_ref}"]'))
         objects = root.findall('.//Item')
         refs = [obj.get('referent') for obj in objects]
         self.assertEqual(len(refs), len(set(refs)))
