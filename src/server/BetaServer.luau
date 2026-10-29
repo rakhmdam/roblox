@@ -44,6 +44,8 @@ function Server.start()
 		s.viewRevision+=1
 		local chances={}
 		for _,id in C.order do chances[id]=Game.weights(s.profile,id,C) end
+		local combat={}
+		for id in s.profile.slimes do combat[id]=Game.combatPreview(s.profile,id,os.time(),C) end
 		local publicBases={}
 		local companions={}
 		for owner,other in sessions do
@@ -60,7 +62,7 @@ function Server.start()
 			result=result,sessionNonce=s.nonce,viewRevision=s.viewRevision,profileRevision=s.profile.revision,
 			profile=s.profile,location=s.location,slot=s.slot,playing=s.playing,busy=s.busy,
 			nodes=if C.islands[s.location] then s.nodes else {},selected=s.selected,
-			chances=chances,bases=publicBases,companions=companions,preview=Game.preview(s.profile),serverTime=os.time(),
+			chances=chances,combat=combat,bases=publicBases,companions=companions,preview=Game.preview(s.profile),serverTime=os.time(),
 			event={id=event.id,active=event.active,nextAt=event.nextAt,endsAt=event.endsAt,hp=event.hp,maxHp=event.maxHp,
 				cycles=event.cycles[player.UserId] or 0},returning=s.returnAt~=nil})
 	end

@@ -37,6 +37,12 @@ function Client.start()
 	local hud=Instance.new("TextLabel"); hud.Size=UDim2.new(1,-24,0,90); hud.Position=UDim2.fromOffset(12,8)
 	hud.BackgroundColor3=Color3.fromRGB(25,48,51); hud.TextColor3=Color3.fromRGB(241,241,216)
 	hud.TextSize=15; hud.TextWrapped=true; hud.Font=Enum.Font.GothamMedium; hud.Text=t("connecting"); hud.Parent=gui
+	local hudCorner=Instance.new("UICorner"); hudCorner.CornerRadius=UDim.new(0,12); hudCorner.Parent=hud
+	local hudStroke=Instance.new("UIStroke"); hudStroke.Color=Color3.fromRGB(89,132,126); hudStroke.Thickness=1; hudStroke.ApplyStrokeMode=Enum.ApplyStrokeMode.Border; hudStroke.Parent=hud
+	local bagTrack=Instance.new("Frame"); bagTrack.Size=UDim2.new(1,-48,0,4); bagTrack.Position=UDim2.fromOffset(24,92)
+	bagTrack.BorderSizePixel=0; bagTrack.BackgroundColor3=Color3.fromRGB(56,87,83); bagTrack.Parent=gui
+	local bagFill=Instance.new("Frame"); bagFill.Size=UDim2.fromScale(0,1); bagFill.BorderSizePixel=0
+	bagFill.BackgroundColor3=Color3.fromRGB(174,220,142); bagFill.Parent=bagTrack
 	local toast=hud:Clone(); toast.Name="Message"; toast.Size=UDim2.new(1,-24,0,48); toast.Position=UDim2.fromOffset(12,154)
 	toast.Visible=false; toast.ZIndex=20; toast.Parent=gui
 	local function notify(message: string)
@@ -65,6 +71,8 @@ function Client.start()
 		b.BackgroundColor3=if enabled==false then Color3.fromRGB(104,121,119) else Color3.fromRGB(164,213,146)
 		b.TextColor3=Color3.fromRGB(25,46,42); b.Font=Enum.Font.GothamMedium; b.TextSize=15; b.TextWrapped=true
 		b.AutoButtonColor=enabled~=false; b.Active=enabled~=false; b.Parent=parent
+		local gradient=Instance.new("UIGradient"); gradient.Rotation=90
+		gradient.Color=ColorSequence.new(Color3.new(1,1,1),Color3.fromRGB(215,232,206)); gradient.Parent=b
 		if enabled~=false then b.Activated:Connect(callback) end
 		local corner=Instance.new("UICorner"); corner.CornerRadius=UDim.new(0,7); corner.Parent=b; return b
 	end
@@ -225,6 +233,14 @@ function Client.start()
 			if not s then currentPanel="team"; renderPanel(); return end
 			local species=C.species[s.speciesId]; local evo=C.evolutions[s.speciesId]
 			panelTitle.Text=slimeTitle(id)
+			local combat=state.combat and state.combat[id]
+			local function showCombat(stats: any)
+				for _,material in C.materials do
+					local value=stats[material]
+					label(content,t(material)..": "..string.format("%.2f / %.2f",value.hit,value.interval))
+				end
+			end
+			if combat then label(content,t("combat")); showCombat(combat.current) end
 			label(content,(if lang=="en" then C.rarityEn else C.rarityRu)[species.rarity].." · "..t(if s.evolutionId then evo.role else species.role).." · "..(s.traitId or "—"))
 			local equipped=table.find(p.team,id)
 			button(content,t(if equipped then "unequip" else "equip"),function()
@@ -242,6 +258,7 @@ function Client.start()
 				button(content,t("rank").." +1 · "..price.." "..t("fragments"),function() spend(t("rank").." +1 — "..price.." "..species.island,"RankSlime",{uid=id,expectedRank=s.rank}) end,p.fragments[species.island]>=price)
 			end
 			if evo and not s.evolutionId then
+				if combat and combat.evolved then label(content,t("afterEvolution")); showCombat(combat.evolved) end
 				local title=t("evolve")..": "..named(evo).." · "..money(evo.coins).." + "..evo.amount.." "..evo.material
 				button(content,title,function() spend(title,"EvolveSlime",{uid=id,recipeId=evo.id}) end,s.level>=3 and p.unlockedIslands[evo.island] and p.coins>=evo.coins and p.materials[evo.material]>=evo.amount)
 			end
@@ -310,6 +327,9 @@ function Client.start()
 		elseif currentPanel=="event" then
 			label(content,t("eventNote"))
 			label(content,tostring(state.event.hp).." / "..tostring(state.event.maxHp).." · "..tostring(state.event.cycles).." / 10")
+			if state.event.cycles>=10 then label(content,t("eventQualified")) end
+			label(content,t("timeLeft")..": "..math.max(0,(if state.event.active then state.event.endsAt else state.event.nextAt)-state.serverTime))
+			button(content,t("travel").." · "..named(C.islands.bay),function() request("Travel",{island="bay"}); open("") end,p.unlockedIslands.bay==true)
 			button(content,t("eventJoin"),function() open(""); request("SelectEvent") end,state.event.active)
 		end
 		panelRevision=p.revision
@@ -358,7 +378,7 @@ function Client.start()
 		elseif snapshot.errorCode then notify(t(snapshot.errorCode)) end
 		if state.busy then notify(t("saving")) end
 		if state.profile.pendingTraitOffer and currentPanel=="" then open("trait") end
-		if currentPanel~="" and (panelRevision~=state.profile.revision or oldLang~=lang) then renderPanel() end
+		if currentPanel~="" and (panelRevision~=state.profile.revision or oldLang~=lang or currentPanel=="event") then renderPanel() end
 	end)
 	local function targetAt(pos: Vector2)
 		if not state or not state.playing or currentPanel~="" or state.busy then return end
@@ -384,6 +404,10 @@ function Client.start()
 			if not state then request("Sync"); continue end
 			local p=state.profile
 			local amount=0; for _,g in p.cargo do amount+=g.count end
+			local capacity=C.bag.values[p.equipment.bagTier]
+			bagTrack.Visible=state.playing
+			bagFill.Size=UDim2.fromScale(math.clamp(amount/capacity,0,1),1)
+			bagFill.BackgroundColor3=if amount>=capacity then Color3.fromRGB(244,192,104) else Color3.fromRGB(174,220,142)
 			if lastGoal~=p.tutorial.step then lastGoal=p.tutorial.step; goalChangedAt=os.clock() end
 			local location=if C.islands[state.location] then named(C.islands[state.location]) else t("home")
 			hud.Text="SLIME SALVAGE · "..location.." · "..money(p.coins).." · "..t("bag").." "..amount.."/"..C.bag.values[p.equipment.bagTier]

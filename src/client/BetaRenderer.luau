@@ -1,6 +1,8 @@
 --!strict
 local Players=game:GetService("Players")
 local RunService=game:GetService("RunService")
+local TweenService=game:GetService("TweenService")
+local Debris=game:GetService("Debris")
 local C=require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Catalog"))
 local text=require(game:GetService("ReplicatedStorage"):WaitForChild("Shared"):WaitForChild("Strings"))
 local Renderer={}
@@ -29,11 +31,26 @@ function Renderer.start(): any
 	local eventModel=Instance.new("Model"); eventModel.Name="GiantWreck"
 	local wreck=part(eventModel,"Wreck",Vector3.new(8,7,7),Vector3.zero,Color3.fromRGB(143,119,92))
 	wreck:SetAttribute("EventTarget",true); eventModel.PrimaryPart=wreck
+	for _,offset in {Vector3.new(-2,1,0),Vector3.new(2,-1,0),Vector3.new(0,2,1)} do
+		local beam=part(eventModel,"HullRib",Vector3.new(9,0.45,0.6),offset,Color3.fromRGB(86,110,119))
+		beam.CFrame*=CFrame.Angles(0,0,0.2); beam.CanQuery=false
+	end
+	local cabin=part(eventModel,"BrokenCabin",Vector3.new(4,3,4),Vector3.new(0,4,0),Color3.fromRGB(196,168,110)); cabin.CanQuery=false
+	local window=part(eventModel,"CabinWindow",Vector3.new(2,1,0.2),Vector3.new(0,4,-2.1),Color3.fromRGB(78,127,143)); window.CanQuery=false
 	local eventLabel=label(wreck,""); eventModel:PivotTo(CFrame.new(400,5,-50))
 	local pointer=part(folder,"TutorialPointer",Vector3.one,Vector3.zero,Color3.new(1,1,1))
 	pointer.Transparency=1; pointer.CanQuery=false
 	local pointerLabel=label(pointer,"▼"); pointerLabel.TextSize=36; pointerLabel.BackgroundTransparency=1
 	local snapshot: any=nil
+	local function impact(position: Vector3,color: Color3,completed: boolean)
+		if snapshot and (snapshot.profile.settings.lowEffects or snapshot.profile.settings.reducedMotion) then return end
+		local ring=part(folder,"Impact",Vector3.new(.1,2.8,2.8),position-Vector3.new(0,.6,0),color)
+		ring.Shape=Enum.PartType.Cylinder; ring.CanQuery=false; ring.Transparency=.4
+		ring.CFrame*=CFrame.Angles(0,0,math.pi/2)
+		local diameter=if completed then 4.8 else 3.5
+		TweenService:Create(ring,TweenInfo.new(.25),{Size=Vector3.new(.1,diameter,diameter),Transparency=1}):Play()
+		Debris:AddItem(ring,.3)
+	end
 	local function makeSlime(speciesId: string,evolved: boolean): Model
 		local model=Instance.new("Model"); model.Name=speciesId
 		local index=table.find(C.speciesOrder,speciesId) or 1
@@ -42,7 +59,10 @@ function Renderer.start(): any
 		body.Shape=Enum.PartType.Ball; body.Material=if evolved then Enum.Material.Metal else Enum.Material.SmoothPlastic
 		for _,x in {-0.5,0.5} do
 			local eye=part(model,"Eye",Vector3.new(0.23,0.34,0.2),Vector3.new(x,0.2,-1.12),Color3.fromRGB(25,45,46)); eye.Shape=Enum.PartType.Ball
+			local glint=part(model,"EyeGlint",Vector3.new(.08,.1,.07),Vector3.new(x-.04,.28,-1.22),Color3.new(1,1,1)); glint.Shape=Enum.PartType.Ball
+			local blush=part(model,"Cheek",Vector3.new(.34,.17,.12),Vector3.new(x*1.5,-.05,-1.05),Color3.fromRGB(237,163,154)); blush.Shape=Enum.PartType.Ball
 		end
+		local mouth=part(model,"Smile",Vector3.new(.3,.12,.12),Vector3.new(0,-.18,-1.24),Color3.fromRGB(48,69,66)); mouth.Shape=Enum.PartType.Ball
 		local function detail(name: string,size: Vector3,pos: Vector3,tint: Color3,shape: Enum.PartType?): Part
 			local p=part(model,name,size,pos,tint); if shape then p.Shape=shape end; return p
 		end
@@ -108,8 +128,10 @@ function Renderer.start(): any
 			local destination=root.Position+Vector3.new((item.index-2)*3.5,-1.8,3.5)
 			if item.target then destination=Vector3.new(item.target[1],item.target[2],item.target[3])+Vector3.new(item.index*2-4,0,2) end
 			if not snapshot.profile.settings.reducedMotion then destination+=Vector3.new(0,math.abs(math.sin(os.clock()*5+item.index))*0.45,0) end
-			if (item.model:GetPivot().Position-destination).Magnitude>70 then item.model:PivotTo(CFrame.new(destination))
-			else item.model:PivotTo(item.model:GetPivot():Lerp(CFrame.new(destination),1-math.exp(-dt*8))) end
+			local facing=if item.target then Vector3.new(item.target[1],destination.Y,item.target[3]) else Vector3.new(root.Position.X,destination.Y,root.Position.Z)
+			local pose=if (facing-destination).Magnitude>.1 then CFrame.lookAt(destination,facing) else CFrame.new(destination)
+			if (item.model:GetPivot().Position-destination).Magnitude>70 then item.model:PivotTo(pose)
+			else item.model:PivotTo(item.model:GetPivot():Lerp(pose,1-math.exp(-dt*8))) end
 		end
 	end)
 	return {
@@ -128,14 +150,43 @@ function Renderer.start(): any
 					p.Shape=if node.family==1 then Enum.PartType.Cylinder elseif node.family==2 then Enum.PartType.Block else Enum.PartType.Ball
 					p.Material=if node.family==2 then Enum.Material.Metal elseif node.family==3 then Enum.Material.Glass else Enum.Material.SmoothPlastic
 					p:SetAttribute("NodeId",node.id); model.PrimaryPart=p
+					local function scrap(name: string,size: Vector3,position: Vector3,color: Color3,shape: Enum.PartType?): Part
+						local piece=part(model,name,size,position,color); piece:SetAttribute("NodeId",node.id)
+						if shape then piece.Shape=shape end; return piece
+					end
+					if node.family==1 then
+						p.Size=Vector3.new(2,1.4,2); p.Color=Color3.fromRGB(212,174,117)
+						local bottle=scrap("Bottle",Vector3.new(.7,1.8,.7),Vector3.new(-.8,.4,.6),Color3.fromRGB(119,182,164),Enum.PartType.Cylinder)
+						bottle.CFrame*=CFrame.Angles(0,0,1.3)
+						scrap("BottleCap",Vector3.new(.3,.3,.3),Vector3.new(-.7,1.3,.6),Color3.fromRGB(230,210,153))
+						scrap("CrushedCup",Vector3.new(.85,.8,.85),Vector3.new(.8,.5,-.5),Color3.fromRGB(231,222,182),Enum.PartType.Cylinder)
+					elseif node.family==2 then
+						p.Size=Vector3.new(2.2,1.4,2.2)
+						local plate=scrap("BentPlate",Vector3.new(2.6,.25,1.4),Vector3.new(0,1,0),Color3.fromRGB(114,145,153))
+						plate.CFrame*=CFrame.Angles(0,.3,.25)
+						for _,side in {-1,1} do
+							local pipe=scrap("RustPipe",Vector3.new(1.8,.55,.55),Vector3.new(side*.7,.4,.5),Color3.fromRGB(173,128,91),Enum.PartType.Cylinder)
+							pipe.CFrame*=CFrame.Angles(0,0,1.1)
+						end
+					else
+						p.Size=Vector3.new(2.4,.9,2.4); p.Color=Color3.fromRGB(113,108,144); p.Material=Enum.Material.Slate
+						for i=-1,1 do
+							local shard=scrap("CrystalShard",Vector3.new(.7,if i==0 then 2 else 1.3,.7),Vector3.new(i*.7,.7,0),Color3.fromRGB(178+i*12,151+i*10,226))
+							shard.CFrame*=CFrame.Angles(0,.7,-i*.2); shard.Material=Enum.Material.Glass
+						end
+					end
 					local band=part(model,"RarityBand",Vector3.new(2.85,0.15,2.85),Vector3.new(0,-0.75,0),rarityColors[node.rarity])
 					band.CanQuery=false
 					entry={model=model,part=p,label=label(p,""),band=band,family=node.family}; nodes[node.id]=entry
 				end
 				entry.model:PivotTo(CFrame.new(node.position[1],node.position[2],node.position[3]))
+				if entry.hp and node.hp<entry.hp then
+					impact(Vector3.new(node.position[1],node.position[2],node.position[3]),rarityColors[node.rarity],node.hp<=0)
+				end
+				entry.hp=node.hp
 				entry.model.Parent=if node.hp>0 then folder else nil
 				local rarityNames=if state.profile.settings.language=="en" then C.rarityEn else C.rarityRu
-				entry.label.Text=rarityNames[node.rarity].." · "..text(node.material,state.profile.settings.language).."\n"..math.ceil(node.hp).." / "..node.maxHp
+				entry.label.Text=({"●","◆","★","✦","♛"})[node.rarity].." "..rarityNames[node.rarity].." · "..text(node.material,state.profile.settings.language).."\n"..math.ceil(node.hp).." / "..node.maxHp
 				entry.band.Color=rarityColors[node.rarity]; entry.label.TextColor3=rarityColors[node.rarity]
 				entry.label.Parent.AlwaysOnTop=not state.profile.settings.lowEffects
 			end

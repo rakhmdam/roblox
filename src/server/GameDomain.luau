@@ -100,6 +100,26 @@ function Game.damage(p: Profile, uid: string?, material: string, now: number, c:
 end
 
 -- Applies to an isolated candidate profile. Returning false means discard the entire candidate.
+function Game.combatPreview(p: Profile, uid: string, now: number, c: any): any
+	local s=p.slimes[uid]
+	if not s then return nil end
+	local result: any={current={},evolved=nil}
+	for _,material in c.materials do
+		local hit,interval=Game.damage(p,uid,material,now,c)
+		result.current[material]={hit=hit,interval=interval}
+	end
+	if c.evolutions[s.speciesId] and not s.evolutionId then
+		local preview=table.clone(p); preview.slimes=table.clone(p.slimes)
+		preview.slimes[uid]=table.clone(s); preview.slimes[uid].evolutionId=c.evolutions[s.speciesId].id
+		result.evolved={}
+		for _,material in c.materials do
+			local hit,interval=Game.damage(preview,uid,material,now,c)
+			result.evolved[material]={hit=hit,interval=interval}
+		end
+	end
+	return result
+end
+
 function Game.apply(p: Profile, action: string, v: any, context: any, c: any): (boolean,any)
 	local now=context.now
 	if action=="SkipTutorial" then

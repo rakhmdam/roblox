@@ -34,6 +34,29 @@ def build():
         for key, value in zip(('X', 'Y', 'Z'), values):
             ET.SubElement(el, key).text = str(value)
 
+    def color(props, name, rgb):
+        el = ET.SubElement(props, 'Color3', name=name)
+        for key, value in zip(('R', 'G', 'B'), rgb):
+            ET.SubElement(el, key).text = str(value)
+
+    lighting, light_props = item(root, 'Lighting', 'Lighting')
+    prop(light_props, 'float', 'ClockTime', 15.2)
+    prop(light_props, 'float', 'Brightness', 2)
+    prop(light_props, 'bool', 'GlobalShadows', 'true')
+    color(light_props, 'Ambient', [.33, .36, .43])
+    color(light_props, 'OutdoorAmbient', [.55, .59, .63])
+    prop(light_props, 'float', 'EnvironmentDiffuseScale', .6)
+    prop(light_props, 'float', 'EnvironmentSpecularScale', .55)
+    _, atmosphere = item(lighting, 'Atmosphere', 'OceanAir')
+    prop(atmosphere, 'float', 'Density', .18)
+    prop(atmosphere, 'float', 'Haze', 1)
+    color(atmosphere, 'Color', [.79, .88, .91])
+    color(atmosphere, 'Decay', [.48, .62, .69])
+    _, grade = item(lighting, 'ColorCorrectionEffect', 'IslandPalette')
+    prop(grade, 'float', 'Saturation', .08)
+    prop(grade, 'float', 'Contrast', .04)
+    color(grade, 'TintColor', [1, .98, .94])
+
     workspace, props = item(root, 'Workspace', 'Workspace')
     prop(props, 'bool', 'StreamingEnabled', 'true')
     prop(props, 'float', 'FallenPartsDestroyHeight', -80)
@@ -58,9 +81,12 @@ def build():
         cf = ET.SubElement(props, 'CoordinateFrame', name='CFrame')
         for key, value in zip(('X', 'Y', 'Z'), part['position']):
             ET.SubElement(cf, key).text = str(value)
+        rotation = world_art.rotation_matrix(part.get('rotation'))
         for row in range(3):
             for col in range(3):
-                ET.SubElement(cf, f'R{row}{col}').text = str(int(row == col))
+                ET.SubElement(cf, f'R{row}{col}').text = str(rotation[row][col])
+        prop(props, 'token', 'Material', {'SmoothPlastic': 272, 'Neon': 288,
+                                        'Wood': 512, 'Metal': 1088}.get(part.get('material'), 272))
         red, green, blue = part['color']
         prop(props, 'Color3uint8', 'Color3uint8', (red << 16) | (green << 8) | blue)
         prop(props, 'token', 'TopSurface', 0)
@@ -82,9 +108,9 @@ def build():
             prop(label_props, 'bool', 'TextWrapped', 'true')
             prop(label_props, 'float', 'BackgroundTransparency', 0.15)
             for name, rgb in [('TextColor3', [1, 1, 0.9]), ('BackgroundColor3', [0.1, 0.2, 0.21])]:
-                color = ET.SubElement(label_props, 'Color3', name=name)
+                color_el = ET.SubElement(label_props, 'Color3', name=name)
                 for key, value in zip(('R', 'G', 'B'), rgb):
-                    ET.SubElement(color, key).text = str(value)
+                    ET.SubElement(color_el, key).text = str(value)
         if part.get('class') == 'SpawnLocation':
             prop(props, 'bool', 'Neutral', 'true')
             prop(props, 'float', 'Duration', 0)

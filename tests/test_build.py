@@ -1,5 +1,6 @@
 import importlib.util
 import unittest
+import math
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -10,6 +11,22 @@ spec.loader.exec_module(builder)
 
 
 class PlaceBuildTests(unittest.TestCase):
+    def test_art_has_bounded_geometry_and_valid_rotations(self):
+        art_spec = importlib.util.spec_from_file_location('world_art', ROOT / 'tools/world_art.py')
+        art = importlib.util.module_from_spec(art_spec)
+        art_spec.loader.exec_module(art)
+        pieces = art.parts()
+        self.assertLess(len(pieces), 2500)
+        for piece in pieces:
+            self.assertTrue(all(math.isfinite(n) and n > 0 for n in piece['size']))
+            rotation = art.rotation_matrix(piece.get('rotation'))
+            for row in rotation:
+                self.assertAlmostEqual(sum(n*n for n in row), 1)
+            self.assertAlmostEqual(sum(rotation[0][i]*rotation[1][i] for i in range(3)), 0)
+            if piece['name'] in ('PierPlank','CraneArm','Amethyst','TreeFoliage','WayfinderLamp'):
+                self.assertFalse(piece['collide'])
+                self.assertFalse(piece['query'])
+
     def test_reproducible_scene_and_current_sources(self):
         path = builder.build()
         first = path.read_bytes()

@@ -301,4 +301,13 @@ test("resource footprints stay clear of stations on every island",function()
 		end
 	end
 end)
+test("evolution preview uses real damage without mutating owned slime",function()
+	local p=profile(); p.tutorial.step=7; p.slimes.a={speciesId="shore_sprout",level=3,rank=1,locked=true}; p.team={"a"}
+	local before=Schema.clone(p)
+	local preview=Game.combatPreview(p,"a",10000,C)
+	assert(preview.evolved.Metal.hit>preview.current.Metal.hit*1.5)
+	assert(preview.evolved.Plastic.hit<preview.evolved.Metal.hit)
+	assert(not p.slimes.a.evolutionId and p.slimes.a.level==before.slimes.a.level and p.slimes.a.locked)
+	assert(Game.combatPreview(p,"missing",10000,C)==nil)
+end)
 print(tostring(total).." beta domain tests passed")
