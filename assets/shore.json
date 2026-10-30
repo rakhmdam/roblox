@@ -1,0 +1,17 @@
+[
+  {"name":"Ocean", "size":[260,1,260], "position":[0,-5,0], "color":[61,157,181], "collide":false},
+  {"name":"Sand", "size":[100,5,90], "position":[0,-2,0], "color":[235,211,158]},
+  {"name":"Meadow", "size":[82,1,70], "position":[0,1,0], "color":[124,174,104]},
+  {"name":"WelcomeSpawn", "class":"SpawnLocation", "size":[8,1,8], "position":[0,2,24], "color":[220,236,194]},
+  {"name":"Path", "size":[8,0.3,44], "position":[0,1.65,0], "color":[232,213,164]},
+  {"name":"RecyclerSample", "size":[7,5,6], "position":[-16,4,18], "color":[57,115,108]},
+  {"name":"RecyclerLid", "size":[8,1,7], "position":[-16,7,18], "color":[151,218,176]},
+  {"name":"WorkshopSample", "size":[8,3,5], "position":[16,3,18], "color":[174,117,72]},
+  {"name":"NurserySample", "size":[9,1,9], "position":[-17,2,-15], "color":[201,184,221]},
+  {"name":"ResourceSample", "size":[3,2,3], "position":[13,3,-10], "color":[170,201,209]},
+  {"name":"Dock", "size":[12,1,26], "position":[0,0.5,53], "color":[162,115,76]},
+  {"name":"TrunkA", "size":[3,8,3], "position":[-30,5,-24], "color":[142,102,69]},
+  {"name":"CrownA", "size":[12,8,12], "position":[-30,12,-24], "color":[70,128,85]},
+  {"name":"TrunkB", "size":[3,7,3], "position":[29,5,26], "color":[142,102,69]},
+  {"name":"CrownB", "size":[11,7,11], "position":[29,11,26], "color":[89,146,91]}
+]

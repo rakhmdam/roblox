@@ -13,5 +13,10 @@ Desktop.ini
 *.bak
 *.lock
 
+# Local snapshots made before updating the existing Studio place
+places/backups/
+
 # Optional build dependencies
 node_modules/
+__pycache__/
+*.pyc
