@@ -466,6 +466,7 @@ function Client.start()
 			if state.returning then hud.Text..="\n"..t("returnHome") end
 			if state.event.active then hud.Text..="\n"..t("event").." · "..math.ceil(state.event.hp).." HP"
 			elseif remaining<=30 then hud.Text..="\n"..t("event").." · "..math.max(0,math.floor(remaining)).."s" end
+			if not state.playing then hud.Text="SLIME SALVAGE" end
 			goalStation=nil
 			local root=if player.Character then player.Character:FindFirstChild("HumanoidRootPart") else nil
 			if root and root:IsA("BasePart") and state.location~="visit" then

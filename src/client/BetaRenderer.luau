@@ -24,6 +24,8 @@ local function label(parent: Instance,text: string): TextLabel
 	l.TextWrapped=true; l.Font=Enum.Font.GothamMedium; l.Text=text; l.Parent=gui; return l
 end
 function Renderer.start(): any
+	local localPlayer=Players.LocalPlayer
+	local mouse=localPlayer:GetMouse()
 	local folder=Instance.new("Folder"); folder.Name="BetaClientArt"; folder.Parent=workspace
 	local nodes: {[number]: any}={}; local slimes: {[string]: any}={}
 	local highlight=Instance.new("Highlight"); highlight.FillTransparency=0.8
@@ -120,6 +122,21 @@ function Renderer.start(): any
 	end
 	RunService.RenderStepped:Connect(function(dt)
 		if not snapshot then return end
+		local character=localPlayer.Character
+		local root=if character then character:FindFirstChild("HumanoidRootPart") else nil
+		local nearest: number?=nil
+		local closest=14
+		if root and root:IsA("BasePart") then
+			for id,entry in nodes do
+				local distance=(entry.part.Position-root.Position).Magnitude
+				if entry.model.Parent==folder and distance<closest then nearest=id; closest=distance end
+			end
+		end
+		local hovered=mouse.Target
+		local hoverId=if hovered then hovered:GetAttribute("NodeId") else nil
+		for id,entry in nodes do
+			entry.label.Parent.Enabled=snapshot.playing and (id==snapshot.selected or id==hoverId or id==nearest)
+		end
 		for _,item in slimes do
 			local owner=Players:GetPlayerByUserId(item.userId)
 			local root=if owner and owner.Character then owner.Character:FindFirstChild("HumanoidRootPart") else nil

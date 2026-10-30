@@ -1,6 +1,8 @@
 import importlib.util
 import unittest
 import math
+import hashlib
+import json
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
@@ -11,6 +13,30 @@ spec.loader.exec_module(builder)
 
 
 class PlaceBuildTests(unittest.TestCase):
+    def test_import_bundle_cannot_start_game_before_installation(self):
+        builder.build()
+        import_spec = importlib.util.spec_from_file_location('studio_import', ROOT / 'tools/studio_import.py')
+        importer = importlib.util.module_from_spec(import_spec)
+        import_spec.loader.exec_module(importer)
+        root = ET.parse(importer.build()).getroot()
+        stage = root.find('Item')
+        self.assertEqual(stage.get('class'), 'Folder')
+        refs = [obj.get('referent') for obj in root.findall('.//Item')]
+        self.assertEqual(len(refs), len(set(refs)))
+        entries = root.findall('.//Item[@class="Script"]') + root.findall('.//Item[@class="LocalScript"]')
+        self.assertEqual(len(entries), 2)
+        for entry in entries:
+            self.assertEqual(entry.findtext('Properties/bool[@name="Disabled"]'), 'true')
+        modules = {obj.findtext('Properties/string[@name="Name"]'): obj
+                   for obj in stage.findall('Item')}
+        encoded = modules['Settings'].findtext('Properties/ProtectedString[@name="Source"]')
+        settings = json.loads(encoded.split('[==[', 1)[1].split(']==]', 1)[0])
+        self.assertEqual(settings['sourceHash'], hashlib.sha256(builder.OUTPUT.read_bytes()).hexdigest())
+        self.assertEqual(settings['worldAnchor'], [0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1])
+        sources = [obj.findtext('Properties/ProtectedString[@name="Source"]') for obj in root.findall('.//Item')]
+        for source in (ROOT / 'src').rglob('*.luau'):
+            self.assertIn(source.read_text(encoding='utf-8'), sources)
+
     def test_art_has_bounded_geometry_and_valid_rotations(self):
         art_spec = importlib.util.spec_from_file_location('world_art', ROOT / 'tools/world_art.py')
         art = importlib.util.module_from_spec(art_spec)

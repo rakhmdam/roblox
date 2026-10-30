@@ -10,5 +10,5 @@ return table.freeze({
 	analyticsEnabled = true,
 	diagnosticsEnabled = true, -- Recorder is additionally restricted to environment Test.
 	-- Bind only IDs of the project's uploaded audio. Empty IDs intentionally stay silent.
-	audio = {music="rbxassetid://77885621577161",collect="rbxassetid://117150528054674",confirm="rbxassetid://104458299374083"},
+	audio = {music="rbxassetid://98622163948938",collect="rbxassetid://128692726294692",confirm="rbxassetid://99174934550714"},
 })
